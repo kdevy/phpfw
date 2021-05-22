@@ -1,0 +1,16 @@
+{
+    "name": "kdevy/phpfw",
+    "description": "My personal prototype php framework.",
+    "type": "project",
+    "require": {
+        "nyholm/psr7": "^1.4",
+        "nyholm/psr7-server": "^1.0",
+        "laminas/laminas-httphandlerrunner": "^1.4",
+        "ralouphie/mimey": "^1.0"
+    },
+    "autoload": {
+        "psr-4": {
+            "Kdevy\\Phpfw\\": "src/"
+        }
+    }
+}
