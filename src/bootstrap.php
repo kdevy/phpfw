@@ -12,6 +12,10 @@ require_once(".." . DIRECTORY_SEPARATOR . "vendor" . DIRECTORY_SEPARATOR . "auto
  */
 require_once("static.php");
 
+date_default_timezone_set("Asia/Tokyo");
+
+session_start();
+
 /**
  * Start main application script.
  */

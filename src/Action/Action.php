@@ -3,6 +3,7 @@
 namespace Kdevy\Phpfw\Action;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use Kdevy\Phpfw\UserContainer;
 
 abstract class Action implements ActionInterface
 {
@@ -20,6 +21,11 @@ abstract class Action implements ActionInterface
      * @var string
      */
     public string $action_name;
+
+    /**
+     * @var UserContainer
+     */
+    public UserContainer $user;
 
     /**
      * @param ServerRequestInterface $request
