@@ -100,3 +100,5 @@ if (DEBUG){
 } else {
     define("LOG_LEVEL", LINFO);
 }
+
+define("SESSION_SAVE_PATH", BASE_DIR . DS . "tmp" . DS . "session");

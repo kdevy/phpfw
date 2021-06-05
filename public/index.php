@@ -8,15 +8,29 @@ use Framework\Exception\HttpError;
 require_once(".." . DIRECTORY_SEPARATOR . "vendor" . DIRECTORY_SEPARATOR . "autoload.php");
 
 date_default_timezone_set("Asia/Tokyo");
-
-session_start();
-
 /**
  * Start main application script.
  */
 require_once(".." . DIRECTORY_SEPARATOR . "config" . DIRECTORY_SEPARATOR . "config.php");
 require_once(CODE_DIR . DS . "functions" . DS . "util.php");
 require_once(CODE_DIR . DS . "functions" . DS . "debug.php");
+
+session_save_path(SESSION_SAVE_PATH);
+ini_set("session.use_cookies", "On");
+ini_set("session.use_only_cookies", "On");
+ini_set("session.use_strict_mode", "On");
+ini_set("session.cookie_httponly", "On");
+ini_set("session.sid_length", "48");
+ini_set("session.sid_bits_per_character", "5");
+
+if (DEBUG) {
+    ini_set("session.cookie_lifetime", 60*60*24*7);
+} else {
+    ini_set("session.cookie_lifetime", 60*30);
+    ini_set("session.cookie_secure", "On");
+}
+
+session_start();
 
 $start_time = hrtime(true);
 
