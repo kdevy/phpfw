@@ -30,7 +30,7 @@ class IndexAction extends TemplateAction
      */
     public function post(ServerRequestInterface $request): ResponseInterface
     {
-        logsave(LDEBUG, "test", "post");
+        logsave("test", "post", LDEBUG);
         return render($this, $this->getContexts($request));
     }
 
@@ -41,11 +41,7 @@ class IndexAction extends TemplateAction
     public function getContexts(ServerRequestInterface $request): array
     {
         $contexts = ["DATE" => date("Y/m/d H:i:s")];
-        if ($_POST) {
-            $contexts["DATA"] = var_dump_string($_POST);
-        } else {
-            $contexts["DATA"] = "no send data.";
-        }
+        $contexts["DATA"] = ($_POST ? var_dump_string($_POST) : "no send data.");
         return $contexts;
     }
 }

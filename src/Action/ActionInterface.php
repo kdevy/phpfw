@@ -22,4 +22,17 @@ interface ActionInterface
      * @return array
      */
     public function getPath(): array;
+
+    /**
+     * @param mixed $path
+     * @param string|null $action_name
+     * @return void
+     */
+    public function setPath($module_name, string $action_name=null): void;
+
+    /**
+     * @param ServerRequestInterface $request
+     * @return void
+     */
+    public function setRequest(ServerRequestInterface $request): void;
 }

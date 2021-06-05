@@ -74,10 +74,9 @@ function var_dump_string($value): string
  *
  * @param string $location
  * @param mixed $value
- * @param mixed ...$args
  * @return void
  */
-function logsave(int $level, string $location, $value, ...$args): void
+function logsave(string $location, $value, int $level=LINFO): void
 {
     $filename = null;
 
@@ -95,21 +94,27 @@ function logsave(int $level, string $location, $value, ...$args): void
     $output = "[" . date("Y-m-d H:i:s") . "][" . str_pad($location, 8) . "][" . LOG_NAMES[$level] . "] ";
     $file = fopen($filename, "a");
 
-    if (count($args) == 0) {
-        if (!is_array($value) && !is_object($value)) {
-            $output .= $value . PHP_EOL;
-        } else {
-            $output .= str_replace(
-                ["\n", "\r", "\r\n"],
-                "",
-                var_export($value, true) . PHP_EOL
-            ) . PHP_EOL;
-        }
-    } else {
+    // exception
+    if ($value instanceof Exception) {
+        $output .= str_replace(["\n", "\r", "\r\n"], " ", sprintf(
+            "%s: %s in %s(%s) Stack trace: %s",
+            $value::class,
+            $value->getMessage(),
+            $value->getFile(),
+            $value->getLine(),
+            $value->getTraceAsString()
+        ));
+    }
+    // string
+    elseif (!is_array($value) && !is_object($value)) {
+        $output .= $value . PHP_EOL;
+    }
+    // array or object
+    else {
         $output .= str_replace(
             ["\n", "\r", "\r\n"],
             "",
-            var_export(array_merge([$value], $args), true)
+            var_export($value, true) . PHP_EOL
         ) . PHP_EOL;
     }
 

@@ -35,10 +35,10 @@ function render(ActionInterface $action, array $contexts = [], ?ResponseInterfac
             $content = assignContexts(file_get_contents($filepath), $contexts);
         } else {
             throw new RuntimeException("Failed to render, the file does not exist ({$filepath}).");
-            logsave(LERROR, "system:render", "Failed to render, the file does not exist ({$filepath}).");
+            logsave("system:render", "Failed to render, the file does not exist ({$filepath}).", LERROR);
         }
     }
-    logsave(LINFO, "system:render", "Render from ({$filepath}).");
+    logsave("system:render", "Render from ({$filepath}).");
 
     $respose_body = $psr17_factory->createStream($content);
     if (!isset($response)) {
@@ -112,6 +112,8 @@ function parsePath($path): array
 /**
  * パスを元に app/module/ 配下のアクションクラスをインスタンス化して返す
  *
+ * TODO: これってfactoryだし、Action::createとかに持っていったほうが良いのでは。
+ *
  * @param string|array $path
  * @param ServerRequestInterface $request
  * @return ActionInterface|null
@@ -121,22 +123,21 @@ function loadAction($path, ServerRequestInterface $request): ?ActionInterface
     list($module_name, $action_name) = parsePath($path);
     $action_class = camelize($action_name) . "Action";
 
-    logsave(LDEBUG, "system:loadAction", "Load class from ({$module_name}/{$action_class}).");
+    logsave("system:loadAction", "Load class from ({$module_name}/{$action_class}).", LDEBUG);
     $action_file_path = MODULE_DIR . DS . $module_name . DS . ACTIONS_DIRNAME . DS . $action_class . ".php";
     if (!file_exists($action_file_path)) {
-        logsave(LDEBUG, "system:loadAction", "Not file exists ($action_file_path).");
+        logsave("system:loadAction", "Not file exists ($action_file_path).", LDEBUG);
         return null;
     }
     require_once $action_file_path;
 
     if (!class_exists($action_class)) {
-        logsave(LDEBUG, "system:loadAction", "Not class exists ($action_class).");
+        logsave("system:loadAction", "Not class exists ($action_class).", LDEBUG);
         return null;
     }
     $action_object = new $action_class();
-    $action_object->module_name = $module_name;
-    $action_object->action_name = $action_name;
-    $action_object->request = $request;
+    $action_object->setPath($module_name, $action_name);
+    $action_object->setRequest($request);
 
     return $action_object;
 }
@@ -155,3 +156,4 @@ function camelize(string $str): string
 {
     return str_replace([' ', '-', '_'], '', ucwords($str, ' -_'));
 }
+
