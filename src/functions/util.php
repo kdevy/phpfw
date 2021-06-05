@@ -29,9 +29,10 @@ function render($filepath, array $contexts = [], ?ResponseInterface $response = 
             $content = assignContexts(file_get_contents($filepath), $contexts);
         } else {
             throw new RuntimeException("Failed to render, the file does not exist ({$filepath}).");
+            logsave(LERROR, "system:render", "Failed to render, the file does not exist ({$filepath}).");
         }
     }
-    logsave("system:render", "Render from ({$filepath}).");
+    logsave(LINFO, "system:render", "Render from ({$filepath}).");
 
     $respose_body = $psr17_factory->createStream($content);
     if (!isset($response)) {
@@ -114,16 +115,16 @@ function loadAction($path, ServerRequestInterface $request): ?ActionInterface
     list($module_name, $action_name) = parsePath($path);
     $action_class = camelize($action_name) . "Action";
 
-    logsave("system:loadAction", "Load class from ({$module_name}/{$action_class}).");
+    logsave(LDEBUG, "system:loadAction", "Load class from ({$module_name}/{$action_class}).");
     $action_file_path = MODULE_DIR . DS . $module_name . DS . ACTIONS_DIRNAME . DS . $action_class . ".php";
     if (!file_exists($action_file_path)) {
-        logsave("system:loadAction", "Not file exists ($action_file_path).");
+        logsave(LDEBUG, "system:loadAction", "Not file exists ($action_file_path).");
         return null;
     }
     require_once $action_file_path;
 
     if (!class_exists($action_class)) {
-        logsave("system:loadAction", "Not class exists ($action_class).");
+        logsave(LDEBUG, "system:loadAction", "Not class exists ($action_class).");
         return null;
     }
     $action_object = new $action_class();

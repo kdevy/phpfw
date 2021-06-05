@@ -57,7 +57,7 @@ class DBIO
             $this->dbh->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
         } catch(\PDOException $e) {
             echo "DBIO Error: " . $e->getMessage();
-            logsave("system:DBIO", "Error: " . $e->getMessage());
+            logsave(LERROR, "system:DBIO", "Error: " . $e->getMessage());
             exit();
         }
     }
@@ -91,7 +91,7 @@ class DBIO
             $this->stmt->execute();
         } catch (\PDOException $e) {
             echo "DBIO Error: " . $e->getMessage();
-            logsave("system:DBIO", "Error: " . $e->getMessage());
+            logsave(LERROR, "system:DBIO", "Error: " . $e->getMessage());
             exit();
         }
     }
@@ -109,7 +109,7 @@ class DBIO
             return $this->stmt->fetch();
         } catch (\PDOException $e) {
             echo "DBIO Error: " . $e->getMessage();
-            logsave("system:DBIO", "Error: " . $e->getMessage());
+            logsave(LERROR, "system:DBIO", "Error: " . $e->getMessage());
             exit();
         }
     }
@@ -127,8 +127,14 @@ class DBIO
             return $this->stmt->fetch(\PDO::FETCH_ASSOC);
         } catch (\PDOException $e) {
             echo "DBIO Error: " . $e->getMessage();
-            logsave("system:DBIO", "Error: " . $e->getMessage());
+            logsave(LERROR, "system:DBIO", "Error: " . $e->getMessage());
             exit();
         }
+    }
+
+    public function getColumns(string $tablename)
+    {
+        $sth = $this->dbh->query("SHOW COLUMNS FROM {$tablename}");
+        return $sth->fetchAll(\PDO::FETCH_COLUMN);
     }
 }

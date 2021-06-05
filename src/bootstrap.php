@@ -39,8 +39,7 @@ $server_request = $creator->fromGlobals();
 
 list($module_name, $action_name) = parsePath($server_request->getUri()->getPath());
 
-logsave("system:init", "module = {$module_name}, action = {$action_name}");
-
+logsave(LINFO, "system:init", "-> Start application from : module = {$module_name}, action = {$action_name}.");
 
 $action_object = loadAction([$module_name, $action_name], $server_request);
 
@@ -65,7 +64,9 @@ try {
 }
 catch(HttpError $e) {
     $code = $e->getCode();
-    $action_object = loadAction(["index", "HttpError{$code}"], $server_request);;
+    $action_object = loadAction(["index", "HttpError{$code}"], $server_request);
+
+    logsave(LINFO, "system:init", "Caught HttpError({$code}) exception, Render the error page.");
 
     if (!isset($action_object)) {
         $emitter->emit($psr17_factory->createResponse($code));
@@ -94,8 +95,9 @@ catch(HttpError $e) {
 $emitter->emit($response);
 
 logsave(
+    LINFO,
     "system:init",
-    "exit MU = " . memory_get_usage(true) / 1024 . " kb"
+    "<- Exit MU = " . memory_get_usage(true) / 1024 . " kb"
         . ", MPU = " . memory_get_peak_usage(true) / 1024 . " kb"
         . " ,LAP = " . substr((hrtime(true) - $start_time) / (1000 * 1000), 0, 6) . " ms"
         . ", IP = " . $_SERVER["REMOTE_ADDR"] . PHP_EOL

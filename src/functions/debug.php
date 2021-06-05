@@ -59,16 +59,20 @@ function vd($value, ...$args): void
 }
 
 /**
- * log/logsave/ 配下にログ出力を行う
+ * status/ 配下にログ出力を行う
  *
  * @param string $location
  * @param mixed $value
  * @param mixed ...$args
  * @return void
  */
-function logsave(string $location, $value, ...$args): void
+function logsave(int $level, string $location, $value, ...$args): void
 {
     $filename = null;
+
+    if (LOG_LEVEL > $level) {
+        return;
+    }
 
     if (strpos($location, ":") !== false) {
         $exp = explode(":", $location);
@@ -77,7 +81,7 @@ function logsave(string $location, $value, ...$args): void
     } else {
         $filename = STATUS_DIR . DS . date("Y-m-d") . ".log";
     }
-    $output = "[" . date("Y-m-d H:i:s") . "][" . str_pad($location, 8) . "] ";
+    $output = "[" . date("Y-m-d H:i:s") . "][" . str_pad($location, 8) . "][" . LOG_NAMES[$level] . "] ";
     $file = fopen($filename, "a");
 
     if (count($args) == 0) {

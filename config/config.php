@@ -39,7 +39,7 @@ define("DB_CONFIG", [
     "default" => [
         "HOST" => "localhost",
         "PORT" => "3306",
-        "NAME" => "kdevy",
+        "NAME" => "world",
         "USER" => "root",
         "PASSWORD" => "",
         "CHARSET" => "utf8mb4",
@@ -50,14 +50,26 @@ define("DB_CONFIG", [
  * Application directory name.
  */
 
+ // ex) modules/{module name}/{ACTIONS_DIRNAME}/HogeAction.php
 define("ACTIONS_DIRNAME", "actions");
+
+ // ex) modules/{module name}/{TEMPLATES_DIRNAME}/hoge.html
 define("TEMPLATES_DIRNAME", "templates");
+
+ // ex) modules/{module name}/{STATICS_DIRNAME}/style.css
 define("STATICS_DIRNAME", "statics");
 
+/**
+ * Other settings.
+ */
 
+// Assign context variables in render().
 define("CONTEXT_KEYWORD", "___");
+
+// Used in APIAction. ex) ?{HTTP_ACTION}={action name}
 define("HTTP_ACTION", "action");
 
+// Http status code phrases.
 define("HTTP_PHRASES", [
     100 => 'Continue', 101 => 'Switching Protocols', 102 => 'Processing',
     200 => 'OK', 201 => 'Created', 202 => 'Accepted', 203 => 'Non-Authoritative Information', 204 => 'No Content', 205 => 'Reset Content', 206 => 'Partial Content', 207 => 'Multi-status', 208 => 'Already Reported',
@@ -70,3 +82,26 @@ define("HTTP_PHRASES", [
  * Debug environment.
  */
 define("DEBUG", true);
+
+/**
+ * logsave() level.
+ */
+define("LDEBUG", 1);
+define("LINFO", 2);
+define("LWARN", 3);
+define("LERROR", 4);
+
+define("LOG_NAMES",
+    [
+        LDEBUG => "DEBUG",
+        LINFO => "INFO",
+        LWARN => "WARN",
+        LERROR => "ERROR",
+    ]
+);
+
+if (DEBUG){
+    define("LOG_LEVEL", LDEBUG);
+} else {
+    define("LOG_LEVEL", LINFO);
+}
