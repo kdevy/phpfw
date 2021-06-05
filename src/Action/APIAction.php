@@ -1,6 +1,6 @@
 <?php
 
-namespace Kdevy\Phpfw\Action;
+namespace Framework\Action;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use \Nyholm\Psr7\Factory\Psr17Factory;

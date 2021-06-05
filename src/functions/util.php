@@ -2,7 +2,7 @@
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use \Nyholm\Psr7\Factory\Psr17Factory;
-use \Kdevy\Phpfw\Action\ActionInterface;
+use \Framework\Action\ActionInterface;
 
 /**
  * コンテキストデータを割り当て済みのファイルコンテンツを、Responseインスタンスとして返す
@@ -11,10 +11,16 @@ use \Kdevy\Phpfw\Action\ActionInterface;
  * @param array $contexts
  * @return ResponseInterface
  */
-function render($filepath, array $contexts = [], ?ResponseInterface $response = null): ResponseInterface
+function render(ActionInterface $action, array $contexts = [], ?ResponseInterface $response = null): ResponseInterface
 {
     $psr17_factory = new Psr17Factory();
     $content = "";
+    $filepath = $action->getPath();
+    /**
+     * TODO: 共通コンテキストの渡し方を考える。
+     */
+    $contexts["MODULE_NAME"] = $filepath[0];
+    $contexts["ACTION_NAME"] = $filepath[1];
 
     // abs path
     if (is_string($filepath) && file_exists($filepath)) {

@@ -1,6 +1,6 @@
 <?php
 
-namespace Kdevy\Phpfw\Action;
+namespace Framework\Action;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
@@ -17,4 +17,9 @@ interface ActionInterface
      * @return void
      */
     public function dispatch(ServerRequestInterface $request): ResponseInterface;
+
+    /**
+     * @return array
+     */
+    public function getPath(): array;
 }

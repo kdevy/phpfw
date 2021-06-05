@@ -1,8 +1,9 @@
 <?php
 
-use Kdevy\Phpfw\Action\Action;
+use Framework\Action\Action;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use Nyholm\Psr7\Factory\Psr17Factory;
 
 class HttpError404Action extends Action
 {
@@ -21,6 +22,8 @@ class HttpError404Action extends Action
     public function dispatch(ServerRequestInterface $request): ResponseInterface
     {
         $contexts = ["URL" => $_SERVER["REQUEST_URI"]];
-        return render([$this->module_name, $this->action_name], $contexts);
+        $psr17_factory = new Psr17Factory();
+        $response = $psr17_factory->createResponse(404);
+        return render($this, $contexts, $response);
     }
 }

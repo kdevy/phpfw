@@ -48,14 +48,25 @@ function vd($value, ...$args): void
     echo "<pre>";
     echo "<div><span style=\"display:inline-block;padding:2px;cursor:pointer;\"
     onclick=\"this.parentNode.parentNode.parentNode.removeChild(this.parentNode.parentNode);\">×</span></div>";
-    ob_start();
     if (count($args) == 0) {
         var_dump($value);
     } else {
         var_dump(array_merge([$value], $args));
     }
-    echo ob_get_clean();
     echo "</pre>";
+}
+
+/**
+ * var_dump ラッパー関数
+ *
+ * @param mixed $value
+ * @return string
+ */
+function var_dump_string($value): string
+{
+    ob_start();
+    var_dump($value);
+    return ob_get_clean();
 }
 
 /**
@@ -77,9 +88,9 @@ function logsave(int $level, string $location, $value, ...$args): void
     if (strpos($location, ":") !== false) {
         $exp = explode(":", $location);
         $location = $exp[1];
-        $filename = STATUS_DIR . DS . $exp[0] . "_" . date("Y-m") . ".log";
+        $filename = STATUS_DIR . DS . $exp[0] . ".log";
     } else {
-        $filename = STATUS_DIR . DS . date("Y-m-d") . ".log";
+        $filename = STATUS_DIR . DS . "default" . ".log";
     }
     $output = "[" . date("Y-m-d H:i:s") . "][" . str_pad($location, 8) . "][" . LOG_NAMES[$level] . "] ";
     $file = fopen($filename, "a");

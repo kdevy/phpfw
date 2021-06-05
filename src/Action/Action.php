@@ -1,9 +1,9 @@
 <?php
 
-namespace Kdevy\Phpfw\Action;
+namespace Framework\Action;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use Kdevy\Phpfw\UserContainer;
+use Framework\UserContainer;
 
 abstract class Action implements ActionInterface
 {
@@ -23,11 +23,6 @@ abstract class Action implements ActionInterface
     public string $action_name;
 
     /**
-     * @var UserContainer
-     */
-    public UserContainer $user;
-
-    /**
      * @param ServerRequestInterface $request
      * @return void
      */
@@ -38,4 +33,12 @@ abstract class Action implements ActionInterface
      * @return void
      */
     abstract public function dispatch(ServerRequestInterface $request): ResponseInterface;
+
+    /**
+     * @return array
+     */
+    public function getPath(): array
+    {
+        return [$this->module_name, $this->action_name];
+    }
 }

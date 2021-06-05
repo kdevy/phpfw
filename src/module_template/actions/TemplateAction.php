@@ -1,6 +1,6 @@
 <?php
 
-use Kdevy\Phpfw\Action\Action;
+use Framework\Action\Action;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
@@ -21,6 +21,6 @@ class TemplateAction extends Action
     public function dispatch(ServerRequestInterface $request): ResponseInterface
     {
         $contexts = [];
-        return render([$this->module_name, $this->action_name], $contexts);
+        return render($this, $contexts);
     }
 }
