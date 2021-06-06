@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Kdevy framework - My original php framework.
+ *
+ * Copyright © 2021 kdevy. All Rights Reserved.
+ */
+
 use Framework\Action\TemplateAction;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -30,7 +36,6 @@ class IndexAction extends TemplateAction
      */
     public function post(ServerRequestInterface $request): ResponseInterface
     {
-        logsave("test", "post", LDEBUG);
         return render($this, $this->getContexts($request));
     }
 
@@ -40,8 +45,9 @@ class IndexAction extends TemplateAction
      */
     public function getContexts(ServerRequestInterface $request): array
     {
-        $contexts = ["DATE" => date("Y/m/d H:i:s")];
-        $contexts["DATA"] = ($_POST ? var_dump_string($_POST) : "no send data.");
+        $contexts = [
+            "TEST" => date("Y-m-d H:i:s")
+        ];
         return $contexts;
     }
 }

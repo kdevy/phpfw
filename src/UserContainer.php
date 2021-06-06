@@ -1,8 +1,15 @@
 <?php
 
-namespace Kdevy\Phpfw;
+/**
+ * Kdevy framework - My original php framework.
+ *
+ * Copyright © 2021 kdevy. All Rights Reserved.
+ */
 
-class UserContainer {
+namespace Framework;
+
+class UserContainer
+{
     /**
      * @var bool
      */
@@ -24,7 +31,7 @@ class UserContainer {
     /**
      * @return boolean
      */
-    public function validateAuth():bool
+    public function validateAuth(): bool
     {
         if ($this->isLogin()) {
             return true;

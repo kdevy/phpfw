@@ -1,5 +1,11 @@
 <?php
 
+/**
+ * Kdevy framework - My original php framework.
+ *
+ * Copyright © 2021 kdevy. All Rights Reserved.
+ */
+
 if (!defined("DS")) {
     define("DS", DIRECTORY_SEPARATOR);
 }
@@ -39,7 +45,7 @@ define("DB_CONFIG", [
     "default" => [
         "HOST" => "localhost",
         "PORT" => "3306",
-        "NAME" => "world",
+        "NAME" => "",
         "USER" => "root",
         "PASSWORD" => "",
         "CHARSET" => "utf8mb4",
@@ -50,10 +56,10 @@ define("DB_CONFIG", [
  * Application directory name.
  */
 
- // ex) modules/{module name}/{ACTIONS_DIRNAME}/HogeAction.php
+// ex) modules/{module name}/{ACTIONS_DIRNAME}/HogeAction.php
 define("ACTIONS_DIRNAME", "actions");
 
- // ex) modules/{module name}/{TEMPLATES_DIRNAME}/hoge.html
+// ex) modules/{module name}/{TEMPLATES_DIRNAME}/hoge.html
 define("TEMPLATES_DIRNAME", "templates");
 
 /**
@@ -86,7 +92,8 @@ define("LINFO", 2);
 define("LWARN", 3);
 define("LERROR", 4);
 
-define("LOG_NAMES",
+define(
+    "LOG_NAMES",
     [
         LDEBUG => "DEBUG",
         LINFO => "INFO",
@@ -95,7 +102,7 @@ define("LOG_NAMES",
     ]
 );
 
-if (DEBUG){
+if (DEBUG) {
     define("LOG_LEVEL", LDEBUG);
 } else {
     define("LOG_LEVEL", LINFO);

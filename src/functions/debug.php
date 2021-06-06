@@ -1,6 +1,12 @@
 <?php
 
 /**
+ * Kdevy framework - My original php framework.
+ *
+ * Copyright © 2021 kdevy. All Rights Reserved.
+ */
+
+/**
  * print_r ラッパー関数 ブラウザ表示用
  *
  * @param mixed $value
@@ -76,7 +82,7 @@ function var_dump_string($value): string
  * @param mixed $value
  * @return void
  */
-function logsave(string $location, $value, int $level=LINFO): void
+function logsave(string $location, $value, int $level = LINFO): void
 {
     $filename = null;
 

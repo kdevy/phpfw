@@ -1,6 +1,12 @@
 <?php
 
-namespace Kdevy\Phpfw;
+/**
+ * Kdevy framework - My original php framework.
+ *
+ * Copyright © 2021 kdevy. All Rights Reserved.
+ */
+
+namespace Framework;
 
 class DBIO
 {
@@ -32,7 +38,7 @@ class DBIO
     /**
      * @param string $target
      */
-    public function __construct(string $target="default")
+    public function __construct(string $target = "default")
     {
         $this->dsn = "mysql:host=" . DB_CONFIG[$target]["HOST"]
             . ";port=" . (DB_CONFIG[$target]["PORT"] ?? 3306)
@@ -48,14 +54,14 @@ class DBIO
      * @param string $target
      * @return void
      */
-    public function connect($target="default"): void
+    public function connect($target = "default"): void
     {
         $this->destroy();
 
         try {
             $this->dbh = new \PDO($this->dsn, $this->user, $this->password);
             $this->dbh->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
-        } catch(\PDOException $e) {
+        } catch (\PDOException $e) {
             echo "DBIO Error: " . $e->getMessage();
             logsave("system:DBIO", $e, LERROR);
             exit();
@@ -76,7 +82,7 @@ class DBIO
      * @param array $params
      * @return void
      */
-    public function sqlbind(string $sql, array $params=[]): void
+    public function sqlbind(string $sql, array $params = []): void
     {
         try {
             if (!isset($this->dbh)) {
@@ -85,8 +91,8 @@ class DBIO
 
             $this->stmt = $this->dbh->prepare($sql);
 
-            foreach($params as $key => $value) {
-                $this->stmt->bindParam($key+1, $value);
+            foreach ($params as $key => $value) {
+                $this->stmt->bindParam($key + 1, $value);
             }
             $this->stmt->execute();
         } catch (\PDOException $e) {

@@ -1,8 +1,15 @@
 <?php
+
+/**
+ * Kdevy framework - My original php framework.
+ *
+ * Copyright © 2021 kdevy. All Rights Reserved.
+ */
+
+use \Framework\Action\ActionInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use \Nyholm\Psr7\Factory\Psr17Factory;
-use \Framework\Action\ActionInterface;
 
 /**
  * コンテキストデータを割り当て済みのファイルコンテンツを、Responseインスタンスとして返す
@@ -156,4 +163,3 @@ function camelize(string $str): string
 {
     return str_replace([' ', '-', '_'], '', ucwords($str, ' -_'));
 }
-

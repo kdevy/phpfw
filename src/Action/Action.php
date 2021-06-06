@@ -1,9 +1,16 @@
 <?php
 
+/**
+ * Kdevy framework - My original php framework.
+ *
+ * Copyright © 2021 kdevy. All Rights Reserved.
+ */
+
 namespace Framework\Action;
+
+use Framework\UserContainer;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use Framework\UserContainer;
 
 abstract class Action implements ActionInterface
 {
@@ -46,7 +53,7 @@ abstract class Action implements ActionInterface
      * @param mixed $path
      * @return void
      */
-    public function setPath($module_name, string $action_name=null): void
+    public function setPath($module_name, string $action_name = null): void
     {
         if (isset($action_name)) {
             $path = [$module_name, $action_name];
