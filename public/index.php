@@ -1,8 +1,8 @@
 <?php
 
-use \Nyholm\Psr7\Factory\Psr17Factory;
-use \Nyholm\Psr7Server\ServerRequestCreator;
-use \Laminas\HttpHandlerRunner\Emitter\SapiEmitter;
+use Nyholm\Psr7\Factory\Psr17Factory;
+use Nyholm\Psr7Server\ServerRequestCreator;
+use Laminas\HttpHandlerRunner\Emitter\SapiEmitter;
 use Framework\Exception\HttpError;
 
 require_once(".." . DIRECTORY_SEPARATOR . "vendor" . DIRECTORY_SEPARATOR . "autoload.php");
@@ -70,8 +70,7 @@ try {
 
     $action_object->initialize($server_request);
     $response = $action_object->dispatch($server_request);
-}
-catch(HttpError $e) {
+} catch (HttpError $e) {
     /**
      * index/HttpError{$e->code}Action.php　が存在する場合はそれを呼び出し、
      * ない場合はデフォルトのエラーHTMLを表示する。

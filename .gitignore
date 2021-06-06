@@ -8,3 +8,6 @@ vendor/
 .DS_Store
 
 *.conf
+
+.php-cs-fixer.cache
+.php-cs-fixer.php

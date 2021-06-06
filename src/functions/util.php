@@ -6,10 +6,10 @@
  * Copyright © 2021 kdevy. All Rights Reserved.
  */
 
-use \Framework\Action\ActionInterface;
+use Framework\Action\ActionInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
-use \Nyholm\Psr7\Factory\Psr17Factory;
+use Nyholm\Psr7\Factory\Psr17Factory;
 
 /**
  * コンテキストデータを割り当て済みのファイルコンテンツを、Responseインスタンスとして返す
@@ -111,7 +111,8 @@ function parsePath($path): array
         $action_name = (isset($path[1]) && $path[1] !== "" ? $path[1] : "index");
     } else {
         $module_name = $path[1];
-        $action_name = (isset($path[2]) && $path[2] !== "" ? $path[2] : "index");;
+        $action_name = (isset($path[2]) && $path[2] !== "" ? $path[2] : "index");
+        ;
     }
     return [$module_name, $action_name];
 }

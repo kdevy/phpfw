@@ -10,7 +10,7 @@ namespace Framework\Action;
 
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use \Nyholm\Psr7\Factory\Psr17Factory;
+use Nyholm\Psr7\Factory\Psr17Factory;
 
 abstract class APIAction extends Action
 {
