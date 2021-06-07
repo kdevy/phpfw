@@ -30,7 +30,9 @@ class CreateModuleHandler extends CreatePathHandler
             exit(1);
         }
         passthru("cp -r " . ACTION_TEMPLATE_DIR . " " . MODULE_DIR . DS . $module_name);
-        passthru("rm -rf " . MODULE_DIR . DS . $module_name . DS . ACTIONS_DIRNAME . DS . "{$this->template_action_class}.php");
+        foreach (self::ACTION_TYPES as $type) {
+            passthru("rm -rf " . MODULE_DIR . DS . $module_name . DS . ACTIONS_DIRNAME . DS . "_" . camelize($type) . "Action.php");
+        }
 
         echo "Creation of the module '{$module_name}' was successfully." . PHP_EOL;
     }

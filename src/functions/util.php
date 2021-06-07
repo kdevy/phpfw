@@ -37,7 +37,7 @@ function render(ActionInterface $action, array $contexts = [], ?ResponseInterfac
         logsave("system:render", "Render from ({$filepath[0]}/{$filepath[1]}).", LDEBUG);
     }
 
-    return createContentsResponse($contents);
+    return createContentsResponse($contents, $response);
 }
 
 /**

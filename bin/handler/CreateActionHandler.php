@@ -34,14 +34,22 @@ class CreateActionHandler extends CreatePathHandler
             passthru(BIN_DIR . DS . "manage create-module {$module_name}");
         }
 
+        // create module directory.
         passthru("cp -p " . ACTION_TEMPLATE_DIR . DS . ACTIONS_DIRNAME . DS . "{$this->template_action_class}.php " .
             " " . MODULE_DIR . DS . $module_name . DS . ACTIONS_DIRNAME . DS  . "{$action_class}.php");
+        // replace class name.
         passthru("sed -i 's/{$this->template_action_class}/{$action_class}/g' " . MODULE_DIR . DS . $module_name . DS . ACTIONS_DIRNAME . DS  . "{$action_class}.php");
+
         $html_template_path = MODULE_DIR . DS . $module_name . DS . TEMPLATES_DIRNAME . DS . str_replace([" ", "-", "_"], "", $action_name) . ".html";
-        if (file_exists($html_template_path)) {
-            echo "Skip: Html template that already exists." . PHP_EOL;
+
+        // api action not create html file.
+        if (!in_array($this->arguments["type"], ["api"])) {
+            if (!file_exists($html_template_path)) {
+                passthru("touch " . $html_template_path);
+            } else {
+                echo "Skip: Html template that already exists." . PHP_EOL;
+            }
         }
-        passthru("touch " . $html_template_path);
 
         echo "Creation of the action '{$action_name}' was successfully." . PHP_EOL;
     }
