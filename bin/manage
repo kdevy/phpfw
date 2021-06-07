@@ -1,0 +1,68 @@
+#!/usr/bin/php -q
+<?php
+
+/**
+ * Kdevy framework - My original php framework.
+ *
+ * Copyright © 2021 kdevy. All Rights Reserved.
+ */
+
+require_once(dirname(__DIR__) . DIRECTORY_SEPARATOR . "config" . DIRECTORY_SEPARATOR . "config.php");
+require_once(VENDOR_DIR . DS . "autoload.php");
+require_once(CODE_DIR . DS . "functions" . DS . "util.php");
+require_once(CODE_DIR . DS . "functions" . DS . "debug.php");
+
+array_shift($argv);
+
+define("HANDLERS", [
+    "create-module" => "Framework\\Command\\Handler\\CreateModuleHandler",
+    "create-action" => "Framework\\Command\\Handler\\CreateActionHandler"
+]);
+
+/**
+ * parsed command arguments.
+ */
+$arguments = [];
+foreach ($argv as $key => $value) {
+    switch ($value) {
+        case "--type":
+        case "-t":
+            $arguments["type"] = $argv[$key + 1] ?? null;
+            if (!isset($arguments["type"])) {
+                echo "Error: Option --type requires a value" . PHP_EOL;
+                exit(1);
+            }
+            unset($argv[$key]);
+            unset($argv[$key + 1]);
+        case "--help":
+        case "-h":
+            // TODO: いずれ実装
+            break;
+        default:
+            if (array_key_exists($value, HANDLERS)) {
+                if (isset($arguments["handler"])) {
+                    echo "Error: Only one handler can be executed." . PHP_EOL;
+                    exit(1);
+                }
+                $arguments["handler"] = $value;
+                $arguments["handler_class"] = HANDLERS[$value];
+                unset($argv[$key]);
+            }
+            break;
+    }
+}
+
+if (!isset($arguments["handler"])) {
+    echo "Error: Hadnler is not specified." . PHP_EOL;
+    exit(1);
+}
+if (!class_exists($arguments["handler_class"])) {
+    echo "Error: Not exists handler class {$arguments["handler_class"]}." . PHP_EOL;
+    exit(1);
+}
+
+$argv = array_merge($argv);
+
+$object = new $arguments["handler_class"]($arguments, $argv);
+$object->main();
+exit(0);

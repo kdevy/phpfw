@@ -35,6 +35,11 @@ define("PUBLIC_DIR", BASE_DIR . DS . "public");
 // php source code directory.
 define("CODE_DIR", BASE_DIR . DS . "src");
 
+define("ACTION_TEMPLATE_DIR", CODE_DIR . DS . "module_template");
+
+define('BIN_DIR', BASE_DIR . DS . "bin");
+
+
 // composer package directory.
 define("VENDOR_DIR", BASE_DIR . DS . "vendor");
 

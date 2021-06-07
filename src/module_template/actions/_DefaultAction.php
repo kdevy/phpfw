@@ -10,7 +10,7 @@ use Framework\Action\Action;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
-class TemplateAction extends Action
+class _DefaultAction extends Action
 {
     /**
      * @param ServerRequestInterface $request

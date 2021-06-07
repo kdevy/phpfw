@@ -11,7 +11,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use Nyholm\Psr7\Factory\Psr17Factory;
 
-class IndexAction extends TemplateAction
+class AboutAction extends TemplateAction
 {
     /**
      * @param ServerRequestInterface $request
@@ -27,11 +27,10 @@ class IndexAction extends TemplateAction
      */
     public function get(ServerRequestInterface $request): ResponseInterface
     {
-        $contexts = ["TEST" => date("Y-m-d H:i:s")];
         $tmpl_contexts = [
-            "TITLE" => "top",
-            "MAIN_C_TITLE" => "Top",
-            "MAIN_C_CONTENTS" => getAssignedFileContents(getTmplAbsPath($this->getPath()), $contexts)
+            "TITLE" => "about",
+            "MAIN_C_TITLE" => "About",
+            "MAIN_C_CONTENTS" => getAssignedFileContents(getTmplAbsPath($this->getPath()), [])
         ];
         $contents = getAssignedFileContents(getTmplAbsPath("/common/default"), $tmpl_contexts);
         return createContentsResponse($contents);
@@ -52,9 +51,6 @@ class IndexAction extends TemplateAction
      */
     public function getContexts(ServerRequestInterface $request): array
     {
-        $contexts = [
-            "TEST" => date("Y-m-d H:i:s")
-        ];
-        return $contexts;
+        return [];
     }
 }

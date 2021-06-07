@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>___TITLE___</title>
+    <style>
+        body {
+            margin: 0;
+        }
+
+        /* header */
+        .header-c {
+            background-color: #AfAfAf;
+            border-bottom: gray;
+            width: 100%;
+        }
+
+        .header-c .logo {
+            font-size: 16px;
+            font-weight: bold;
+            padding: 5px 8px;
+        }
+
+        .header-c .logo a {
+            text-decoration: none;
+            color: black;
+        }
+
+        .menu {
+            background: #ccc;
+            padding: 0 8px;
+        }
+
+        .menu ul,
+        li {
+            margin: 0;
+            padding: 0;
+            list-style-type: none;
+        }
+
+        .menu .menu-i {
+            display: table-cell;
+            padding: 2px 6px;
+        }
+
+        .menu .menu-i+.menu-i {
+            border-left: solid 1px gray;
+        }
+
+        .menu .menu-i:first-child {
+            border-left: solid 1px gray;
+        }
+
+        .menu .menu-i:last-child {
+            border-right: solid 1px gray;
+        }
+
+        .menu .menu-i:hover {
+            background: #bbb;
+        }
+
+        .active {
+            background: lightblue;
+        }
+
+        /* main */
+        .main-c {
+            margin: 0 8px;
+        }
+
+        .main-c-title {
+            font-weight: bold;
+            font-size: 20px;
+            border-bottom: solid 1px gray;
+            padding: 4px 0;
+        }
+
+        .main-c-inner {
+            margin: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="body-wrapper">
+        <header class="header-c">
+            <div class="logo"><a href="/">Kdevy framework</a></div>
+            <div class="menu">
+                <ul>
+                    <li class="menu-i"><a href="/">TOP</a></li>
+                    <li class="menu-i"><a href="/about">About</a></li>
+                    <li class="menu-i"><a href="/contact">contact</a></li>
+                </ul>
+            </div>
+        </header>
+        <div class="main-c">
+            <div class="main-c-title">___MAIN_C_TITLE___</div>
+            <div class="main-c-inner">___MAIN_C_CONTENTS___</div>
+        </div>
+        <footer class="footer-c"></footer>
+        <script>
+            window.addEventListener("DOMContentLoaded", function() {
+                let menuElms = document.getElementsByClassName("menu");
+
+                Array.from(menuElms).forEach(function(menuElm, MenuKey) {
+                    let itemElms = menuElm.getElementsByClassName("menu-i");
+
+                    Array.from(itemElms).forEach(function(itemElm, itemKey) {
+                        let linkElms = itemElm.getElementsByTagName("a");
+                        if (linkElms.length == 0) {
+                            return;
+                        }
+
+                        if (linkElms[0].getAttribute("href") === location.pathname) {
+                            itemElm.classList.add("active");
+                        }
+                    });
+                });
+            });
+        </script>
+    </div>
+</body>
+
+</html>

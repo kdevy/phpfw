@@ -9,7 +9,8 @@
     },
     "autoload": {
         "psr-4": {
-            "Framework\\": "src/"
+            "Framework\\": "src/",
+            "Framework\\Command\\Handler\\": "bin/handler/"
         }
     },
     "require-dev": {
