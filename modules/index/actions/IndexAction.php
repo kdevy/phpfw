@@ -47,8 +47,6 @@ class IndexAction extends TemplateAction
     {
         $contexts = [
             "TEST" => date("Y-m-d H:i:s"),
-            "TITLE" => "Top",
-            "MAIN_C_TITLE" => "Top",
         ];
         return $contexts;
     }
