@@ -45,7 +45,7 @@ class Render
      */
     public function createResponse(array $contexts = [], ResponseInterface $response = null): ResponseInterface
     {
-        $template = "___" . self::TEMPLATE_CONTEXT_NAME . "___";
+        $template = CONTEXT_KEYWORD . self::TEMPLATE_CONTEXT_NAME . CONTEXT_KEYWORD;
         $psr17_factory = new Psr17Factory();
         if (!isset($response)) {
             $response = $psr17_factory->createResponse(200);
@@ -57,7 +57,7 @@ class Render
             }
         }
         $template = str_replace(
-            "___" . self::TEMPLATE_CONTEXT_NAME . "___",
+            CONTEXT_KEYWORD . self::TEMPLATE_CONTEXT_NAME . CONTEXT_KEYWORD,
             getFileContents($this->path),
             $template
         );
