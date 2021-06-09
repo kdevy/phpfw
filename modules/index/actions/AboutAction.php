@@ -9,7 +9,6 @@
 use Framework\Action\TemplateAction;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use Nyholm\Psr7\Factory\Psr17Factory;
 
 class AboutAction extends TemplateAction
 {
@@ -19,6 +18,7 @@ class AboutAction extends TemplateAction
      */
     public function initialize(ServerRequestInterface $request): void
     {
+        $this->render->useTemplate("/common/default");
     }
 
     /**
@@ -27,13 +27,7 @@ class AboutAction extends TemplateAction
      */
     public function get(ServerRequestInterface $request): ResponseInterface
     {
-        $tmpl_contexts = [
-            "TITLE" => "about",
-            "MAIN_C_TITLE" => "About",
-            "MAIN_C_CONTENTS" => getAssignedFileContents(getTmplAbsPath($this->getPath()), [])
-        ];
-        $contents = getAssignedFileContents(getTmplAbsPath("/common/default"), $tmpl_contexts);
-        return createContentsResponse($contents);
+        return $this->render->createResponse($this->getContexts($request));
     }
 
     /**
@@ -42,7 +36,7 @@ class AboutAction extends TemplateAction
      */
     public function post(ServerRequestInterface $request): ResponseInterface
     {
-        return render($this, $this->getContexts($request));
+        return $this->render->createResponse($this->getContexts($request));
     }
 
     /**
@@ -51,6 +45,10 @@ class AboutAction extends TemplateAction
      */
     public function getContexts(ServerRequestInterface $request): array
     {
-        return [];
+        $contexts = [
+            "TITLE" => "about",
+            "MAIN_C_TITLE" => "About",
+        ];
+        return $contexts;
     }
 }

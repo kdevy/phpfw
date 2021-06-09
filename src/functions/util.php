@@ -74,12 +74,20 @@ function createContentsResponse(?string $contents, ResponseInterface $response =
  */
 function getAssignedFileContents($path, array $contexts = []): ?string
 {
-    $path = getTmplAbsPath($path);
+    return assignContexts(getFileContents($path), $contexts);
+}
 
+/**
+ * @param string|array $path
+ * @return void
+ */
+function getFileContents($path): ?string
+{
+    $path = getTmplAbsPath($path);
     if (file_exists($path)) {
-        return assignContexts(file_get_contents($path), $contexts);
+        return file_get_contents($path);
     }
-    logsave("system:getAssignedFileContents", "File does not exsits ({$path}).", LDEBUG);
+    logsave("system:getFileContents", "File does not exsits ({$path}).", LDEBUG);
     return null;
 }
 
@@ -91,10 +99,10 @@ function getAssignedFileContents($path, array $contexts = []): ?string
  * @param mixed $text
  * @return string
  */
-function assignContexts($text, $contexts): string
+function assignContexts($text, $contexts): ?string
 {
     if ($text === null || $text === false || trim($text) === "") {
-        return "";
+        return null;
     }
 
     $match_strs = [];
@@ -221,8 +229,7 @@ function loadAction($path, ServerRequestInterface $request): ?ActionInterface
         logsave("system:loadAction", "Not class exists ($action_class).", LDEBUG);
         return null;
     }
-    $action_object = new $action_class();
-    $action_object->setPath($module_name, $action_name);
+    $action_object = new $action_class([$module_name, $action_name]);
     $action_object->setRequest($request);
 
     return $action_object;

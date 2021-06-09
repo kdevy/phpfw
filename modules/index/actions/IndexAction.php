@@ -9,7 +9,6 @@
 use Framework\Action\TemplateAction;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use Nyholm\Psr7\Factory\Psr17Factory;
 
 class IndexAction extends TemplateAction
 {
@@ -19,6 +18,7 @@ class IndexAction extends TemplateAction
      */
     public function initialize(ServerRequestInterface $request): void
     {
+        $this->render->useTemplate("/common/default");
     }
 
     /**
@@ -27,14 +27,7 @@ class IndexAction extends TemplateAction
      */
     public function get(ServerRequestInterface $request): ResponseInterface
     {
-        $contexts = ["TEST" => date("Y-m-d H:i:s")];
-        $tmpl_contexts = [
-            "TITLE" => "top",
-            "MAIN_C_TITLE" => "Top",
-            "MAIN_C_CONTENTS" => getAssignedFileContents(getTmplAbsPath($this->getPath()), $contexts)
-        ];
-        $contents = getAssignedFileContents(getTmplAbsPath("/common/default"), $tmpl_contexts);
-        return createContentsResponse($contents);
+        return $this->render->createResponse($this->getContexts($request));
     }
 
     /**
@@ -43,7 +36,7 @@ class IndexAction extends TemplateAction
      */
     public function post(ServerRequestInterface $request): ResponseInterface
     {
-        return render($this, $this->getContexts($request));
+        return $this->render->createResponse($this->getContexts($request));
     }
 
     /**
@@ -53,7 +46,9 @@ class IndexAction extends TemplateAction
     public function getContexts(ServerRequestInterface $request): array
     {
         $contexts = [
-            "TEST" => date("Y-m-d H:i:s")
+            "TEST" => date("Y-m-d H:i:s"),
+            "TITLE" => "Top",
+            "MAIN_C_TITLE" => "Top",
         ];
         return $contexts;
     }

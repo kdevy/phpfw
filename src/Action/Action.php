@@ -9,11 +9,14 @@
 namespace Framework\Action;
 
 use Framework\UserContainer;
+use Framework\Render;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
 abstract class Action implements ActionInterface
 {
+    protected Render $render;
+
     /**
      * @var ServerRequestInterface
      */
@@ -28,6 +31,13 @@ abstract class Action implements ActionInterface
      * @var string
      */
     public string $action_name;
+
+    public function __construct($path)
+    {
+        $this->setPath($path);
+        $this->render = new Render();
+        $this->render->setPath($path);
+    }
 
     /**
      * @param ServerRequestInterface $request
@@ -50,7 +60,8 @@ abstract class Action implements ActionInterface
     }
 
     /**
-     * @param mixed $path
+     * @param array|string $module_name
+     * @param string $action_name
      * @return void
      */
     public function setPath($module_name, string $action_name = null): void
