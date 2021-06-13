@@ -28,11 +28,11 @@ class CreatePathHandler extends Handler
     {
         parent::__construct($arguments, $argv);
 
-        $arguments["type"] = $arguments["type"] ?? "default";
-        if (!in_array($arguments["type"], self::ACTION_TYPES)) {
-            echo "An unknown type {$arguments["type"]} was passed." . PHP_EOL;
+        $this->arguments["type"] = $this->arguments["type"] ?? "default";
+        if (!in_array($this->arguments["type"], self::ACTION_TYPES)) {
+            echo "An unknown type {$this->arguments["type"]} was passed." . PHP_EOL;
             exit(1);
         }
-        $this->template_action_class = "_" . camelize($arguments["type"]) . "Action";
+        $this->template_action_class = "_" . camelize($this->arguments["type"]) . "Action";
     }
 }

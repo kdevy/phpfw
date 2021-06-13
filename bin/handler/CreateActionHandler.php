@@ -9,6 +9,7 @@
 namespace Framework\Command\Handler;
 
 use Framework\Command\Handler\CreatePathHandler;
+use Framework\Route;
 
 class CreateActionHandler extends CreatePathHandler
 {
@@ -22,25 +23,25 @@ class CreateActionHandler extends CreatePathHandler
             exit(1);
         }
 
-        list($module_name, $action_name) = $this->argv;
-        $action_class = camelize($action_name) . "Action";
+        $route = Route::create($this->argv);
+        $action_file_path = $route->getActionAbsPath();
+        $html_template_path = $route->getTemplateAbsPath();
+        $action_class = $route->getActionClassName();
 
-        if (file_exists(MODULE_DIR . DS . $module_name . DS . ACTIONS_DIRNAME . DS  . "{$action_class}.php")) {
-            echo "Error: Action {$action_name} that already exists." . PHP_EOL;
+        if (file_exists($action_file_path)) {
+            echo "Error: Action " . $route->getActionName() . " that already exists." . PHP_EOL;
             exit(1);
         }
 
-        if (!file_exists(MODULE_DIR . DS . $module_name)) {
-            passthru(BIN_DIR . DS . "manage create-module {$module_name}");
+        if (!file_exists(MODULE_DIR . DS . $route->getModuleName())) {
+            passthru(BIN_DIR . DS . "manage create-module " . $route->getModuleName());
         }
 
         // create module directory.
         passthru("cp -p " . ACTION_TEMPLATE_DIR . DS . ACTIONS_DIRNAME . DS . "{$this->template_action_class}.php " .
-            " " . MODULE_DIR . DS . $module_name . DS . ACTIONS_DIRNAME . DS  . "{$action_class}.php");
+            " " . $action_file_path);
         // replace class name.
-        passthru("sed -i 's/{$this->template_action_class}/{$action_class}/g' " . MODULE_DIR . DS . $module_name . DS . ACTIONS_DIRNAME . DS  . "{$action_class}.php");
-
-        $html_template_path = MODULE_DIR . DS . $module_name . DS . TEMPLATES_DIRNAME . DS . str_replace([" ", "-", "_"], "", $action_name) . ".html";
+        passthru("sed -i 's/{$this->template_action_class}/{$action_class}/g' " . $action_file_path);
 
         // api action not create html file.
         if (!in_array($this->arguments["type"], ["api"])) {
@@ -51,6 +52,6 @@ class CreateActionHandler extends CreatePathHandler
             }
         }
 
-        echo "Creation of the action '{$action_name}' was successfully." . PHP_EOL;
+        echo "Creation of the action '" . $route->getActionName() . "' was successfully." . PHP_EOL;
     }
 }
