@@ -7,6 +7,7 @@
  */
 
 use Framework\Action\ActionInterface;
+use Framework\Route;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Nyholm\Psr7\Factory\Psr17Factory;
@@ -14,7 +15,7 @@ use Nyholm\Psr7\Factory\Psr17Factory;
 /**
  * コンテキストデータを割り当て済みのファイルコンテンツを、Responseインスタンスとして返す
  *
- * @param string $filepath
+ * @param ActionInterface $action
  * @param array $contexts
  * @return ResponseInterface
  */
@@ -22,19 +23,21 @@ function render(ActionInterface $action, array $contexts = [], ?ResponseInterfac
 {
     $psr17_factory = new Psr17Factory();
     $content = "";
-    $filepath = $action->getPath();
+
     /**
      * TODO: 共通コンテキストの渡し方を考える。
      */
-    $contexts["MODULE_NAME"] = $filepath[0];
-    $contexts["ACTION_NAME"] = $filepath[1];
+    $contexts["MODULE_NAME"] = $action->route->getModuleName();
+    $contexts["ACTION_NAME"] = $action->route->getActionName();
 
-    $contents = getAssignedFileContents($filepath, $contexts);
+    $contents = getAssignedFileContents($action->route, $contexts);
     if (!isset($contents)) {
         $contents = "";
-        logsave("system:render", "Failed to render, the file does not exist ({$filepath}).", LDEBUG);
+        logsave("system:render", "Failed to render, the file does not exist ("
+            . $action->route->getPathName() . ").", LDEBUG);
     } else {
-        logsave("system:render", "Render from ({$filepath[0]}/{$filepath[1]}).", LDEBUG);
+        logsave("system:render", "Render from ("
+            . $action->route->getPathName() . ").", LDEBUG);
     }
 
     return createContentsResponse($contents, $response);
@@ -68,22 +71,23 @@ function createContentsResponse(?string $contents, ResponseInterface $response =
  *
  * 存在しないファイル場合はnullを返す
  *
- * @param string|array $path
+ * @param Route $route
  * @param array $contexts
  * @return null|string
  */
-function getAssignedFileContents($path, array $contexts = []): ?string
+function getAssignedFileContents(Route $route, array $contexts = []): ?string
 {
-    return assignContexts(getFileContents($path), $contexts);
+    return assignContexts(getFileContents($route), $contexts);
 }
 
 /**
- * @param string|array $path
+ * @param Route
  * @return void
  */
-function getFileContents($path): ?string
+function getFileContents(Route $route): ?string
 {
-    $path = getTmplAbsPath($path);
+    $path = $route->getTemplateAbsPath();
+
     if (file_exists($path)) {
         return file_get_contents($path);
     }
@@ -124,101 +128,21 @@ function assignContexts($text, $contexts): ?string
 }
 
 /**
- * パス文字列を解析してモジュール名とアクション名を返す
- *
- * @param string|array $path
- * @return array|null
- */
-function parsePath($path): array
-{
-    if (is_array($path)) {
-        return $path;
-    }
-    if (empty($path)) {
-        return null;
-    }
-    $module_name = null;
-    $action_name = null;
-
-    if (strpos($path, "?") !== false) {
-        $path = explode("/", explode("?", $path)[0]);
-    } else {
-        $path = explode("/", $path);
-    }
-
-    if (count($path) == 2) {
-        $module_name = "index";
-        $action_name = (isset($path[1]) && $path[1] !== "" ? $path[1] : "index");
-    } else {
-        $module_name = $path[1];
-        $action_name = (isset($path[2]) && $path[2] !== "" ? $path[2] : "index");;
-    }
-    return [$module_name, $action_name];
-}
-
-/**
- * テンプレートファイルの絶対パスを返す
- * 絶対パス、"/module_name/action_name"、["module_name", "action_name"]を渡すことが可能
- *
- * 返すパスが実際に存在するかはチェックしない
- *
- * @param string|array $path
- * @return string
- */
-function getTmplAbsPath($path): string
-{
-    // abs path
-    if (is_string($path) && file_exists($path)) {
-        return $path;
-    }
-    // /{module name}/{action name} or [{module name}, {action name}]
-    else {
-        $path = parsePath($path);
-        return MODULE_DIR . DS . $path[0] . DS . TEMPLATES_DIRNAME . DS . strtolower($path[1]) . ".html";
-    }
-}
-
-/**
- * アクションファイルの絶対パスを返す
- * 絶対パス、"/module_name/action_name"、["module_name", "action_name"]を渡すことが可能
- *
- * 返すパスが実際に存在するかはチェックしない
- *
- * @param string|array $path
- * @return string
- */
-function getActionAbsPath($path): string
-{
-    // abs path
-    if (is_string($path) && file_exists($path)) {
-        return $path;
-    }
-    // /{module name}/{action name} or [{module name}, {action name}]
-    else {
-        list($module_name, $action_name) = parsePath($path);
-        $action_class = camelize($action_name) . "Action";
-        return MODULE_DIR . DS . $module_name . DS . ACTIONS_DIRNAME . DS . $action_class . ".php";
-    }
-}
-
-/**
  * パスを元に app/module/ 配下のアクションクラスをインスタンス化して返す
  * 読み込めなかった場合はnullを返す
  *
  * TODO: これってfactoryだし、Action::createとかに持っていったほうが良いのでは。
  *
- * @param string|array $path
+ * @param Route $route
  * @param ServerRequestInterface $request
  * @return ActionInterface|null
  */
-function loadAction($path, ServerRequestInterface $request): ?ActionInterface
+function loadAction(Route $route, ServerRequestInterface $request): ?ActionInterface
 {
-    list($module_name, $action_name) = parsePath($path);
-    $action_file_path = getActionAbsPath([$module_name, $action_name]);
+    $action_class = $route->getActionClassName();
+    $action_file_path = $route->getActionAbsPath();
 
-    $action_class = camelize($action_name) . "Action";
-
-    logsave("system:loadAction", "Load class from ({$module_name}/{$action_class}).", LDEBUG);
+    logsave("system:loadAction", "Load class from (" . $route->getPathName() . ").", LDEBUG);
     if (!file_exists($action_file_path)) {
         logsave("system:loadAction", "Not file exists ($action_file_path).", LDEBUG);
         return null;
@@ -229,7 +153,7 @@ function loadAction($path, ServerRequestInterface $request): ?ActionInterface
         logsave("system:loadAction", "Not class exists ($action_class).", LDEBUG);
         return null;
     }
-    $action_object = new $action_class([$module_name, $action_name]);
+    $action_object = new $action_class($route);
     $action_object->setRequest($request);
 
     return $action_object;
@@ -238,7 +162,6 @@ function loadAction($path, ServerRequestInterface $request): ?ActionInterface
 /**
  * 文字列をキャメルケースにする
  *
- * "my name is john" convert to "MyNameIsJohn"
  * "my-name-is-john" convert to "MyNameIsJohn"
  * "my_name_is_john" convert to "MyNameIsJohn"
  *
@@ -247,5 +170,19 @@ function loadAction($path, ServerRequestInterface $request): ?ActionInterface
  */
 function camelize(string $str): string
 {
-    return str_replace([' ', '-', '_'], '', ucwords($str, ' -_'));
+    return str_replace(['-', '_'], '', ucwords($str, ' -_'));
+}
+
+/**
+ * @param string $str
+ * @param string $separator
+ * @return string
+ */
+function decamelize(string $str, string $separator = "-"): string
+{
+    $words = preg_split("/((?<=[a-z])(?=[A-Z])|(?=[A-Z][a-z]))/", $str);
+    if ($words[0] == "") {
+        array_shift($words);
+    }
+    return strtolower(implode($separator, $words));
 }

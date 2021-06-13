@@ -4,6 +4,7 @@ use Nyholm\Psr7\Factory\Psr17Factory;
 use Nyholm\Psr7Server\ServerRequestCreator;
 use Laminas\HttpHandlerRunner\Emitter\SapiEmitter;
 use Framework\Exception\HttpError;
+use Framework\Route;
 
 require_once(".." . DIRECTORY_SEPARATOR . "vendor" . DIRECTORY_SEPARATOR . "autoload.php");
 
@@ -24,9 +25,9 @@ ini_set("session.sid_length", "48");
 ini_set("session.sid_bits_per_character", "5");
 
 if (DEBUG) {
-    ini_set("session.cookie_lifetime", 60*60*24*7);
+    ini_set("session.cookie_lifetime", 60 * 60 * 24 * 7);
 } else {
-    ini_set("session.cookie_lifetime", 60*30);
+    ini_set("session.cookie_lifetime", 60 * 30);
     ini_set("session.cookie_secure", "On");
 }
 
@@ -46,20 +47,22 @@ $creator = new ServerRequestCreator(
 
 $server_request = $creator->fromGlobals();
 
-list($module_name, $action_name) = parsePath($server_request->getUri()->getPath());
+$route = Route::create($server_request->getUri()->getPath());
 
-logsave("system:init", "-> Start application from : module = {$module_name}, action = {$action_name}.");
+logsave("system:init", "-> Start application from " . $route->getPathName() . " .");
 
-$action_object = loadAction([$module_name, $action_name], $server_request);
+$action_object = loadAction($route, $server_request);
 
 if (!isset($action_object)) {
     // call $modulename within common action.
-    $action_object = loadAction([$module_name, "common"], $server_request);
+    $route->setPath($route->getModuleName(), "common");
+    $action_object = loadAction($route, $server_request);
 }
 
 if (!isset($action_object)) {
     // call common module action.
-    $action_object = loadAction(["common", "common"], $server_request);
+    $route->setPath("common", "common");
+    $action_object = loadAction($route, $server_request);
 }
 
 try {
@@ -76,7 +79,8 @@ try {
      * ない場合はデフォルトのエラーHTMLを表示する。
      */
     $code = $e->getCode();
-    $action_object = loadAction(["index", "HttpError{$code}"], $server_request);
+    $route->setPath("index", "http-error{$code}");
+    $action_object = loadAction($route, $server_request);
 
     logsave("system:init", "Caught HttpError({$code}) exception, Render the error page.");
 

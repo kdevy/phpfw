@@ -49,11 +49,21 @@ class Route
      * @param string|null $action_name
      * @return self
      */
-    public function withPath($module_name, $action_name): self
+    public function setPath($module_name, $action_name): self
     {
-        $route = clone $this;
-        $route->path = self::parse($module_name, $action_name);
-        return $route;
+        $this->path = self::parse($module_name, $action_name);
+        return $this;
+    }
+
+    /**
+     * @param string|array $module_name
+     * @param string|null $action_name
+     * @return self
+     */
+    public function withPath($module_name, $action_name): array
+    {
+        $this->path = self::parse($module_name, $action_name);
+        return $this->path;
     }
 
     /**
@@ -73,11 +83,31 @@ class Route
     }
 
     /**
+     * @param string $module_name
+     * @return self
+     */
+    public function setModuleName(string $module_name): self
+    {
+        $this->path[0] = $module_name;
+        return $this;
+    }
+
+    /**
      * @return string
      */
     public function getActionName(): string
     {
         return $this->path[1];
+    }
+
+    /**
+     * @param string $module_name
+     * @return self
+     */
+    public function setActionName(string $action_name): self
+    {
+        $this->path[1] = $action_name;
+        return $this;
     }
 
     /**
@@ -87,7 +117,7 @@ class Route
     {
         return
             MODULE_DIR . DS . $this->getModuleName()
-            . DS . TEMPLATES_DIRNAME . DS . strtolower($this->getActionName()) . ".html";
+            . DS . TEMPLATES_DIRNAME . DS . $this->getTemplateName() . ".html";
     }
 
     /**
@@ -96,6 +126,14 @@ class Route
     public function getActionClassName(): string
     {
         return camelize($this->getActionName()) . "Action";
+    }
+
+    /**
+     * @return string
+     */
+    public function getTemplateName(): string
+    {
+        return strtolower(str_replace([" ", "_", "-"], "-", $this->getActionName()));
     }
 
     /**
@@ -141,8 +179,13 @@ class Route
             throw new \InvalidArgumentException("Root path is up to two hierarchy.");
         }
 
-        $result[0] = (isset($result[0]) && trim($result[0]) !== "" ? $result[0] : "index");
-        $result[1] = (isset($result[1]) && trim($result[1]) !== "" ? $result[1] : "index");
+        if (count($result) == 1) {
+            $result[1] = (isset($result[0]) && trim($result[0]) !== "" ? $result[0] : "index");
+            $result[0] = "index";
+        } else {
+            $result[0] = (isset($result[0]) && trim($result[0]) !== "" ? $result[0] : "index");
+            $result[1] = (isset($result[1]) && trim($result[1]) !== "" ? $result[1] : "index");
+        }
         return $result;
     }
 

@@ -8,8 +8,8 @@
 
 namespace Framework\Action;
 
-use Framework\UserContainer;
 use Framework\Render;
+use Framework\Route;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
@@ -23,20 +23,15 @@ abstract class Action implements ActionInterface
     public ServerRequestInterface $request;
 
     /**
-     * @var string
+     * @var Route
      */
-    public string $module_name;
+    public Route $route;
 
-    /**
-     * @var string
-     */
-    public string $action_name;
-
-    public function __construct($path)
+    public function __construct(Route $route)
     {
-        $this->setPath($path);
+        $this->setPath($route);
         $this->render = new Render();
-        $this->render->setPath($path);
+        $this->render->setPath($route);
     }
 
     /**
@@ -52,28 +47,20 @@ abstract class Action implements ActionInterface
     abstract public function dispatch(ServerRequestInterface $request): ResponseInterface;
 
     /**
-     * @return array
+     * @return Route
      */
-    public function getPath(): array
+    public function getPath(): Route
     {
-        return [$this->module_name, $this->action_name];
+        return $this->route;
     }
 
     /**
-     * @param array|string $module_name
-     * @param string $action_name
+     * @param Route $route
      * @return void
      */
-    public function setPath($module_name, string $action_name = null): void
+    public function setPath(Route $route): void
     {
-        if (isset($action_name)) {
-            $path = [$module_name, $action_name];
-        } else {
-            $path = $module_name;
-        }
-        $path = parsePath($path);
-        $this->module_name = $path[0];
-        $this->action_name = $path[1];
+        $this->route = $route;
     }
 
     /**

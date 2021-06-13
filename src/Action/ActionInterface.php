@@ -10,6 +10,7 @@ namespace Framework\Action;
 
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use Framework\Route;
 
 interface ActionInterface
 {
@@ -26,16 +27,15 @@ interface ActionInterface
     public function dispatch(ServerRequestInterface $request): ResponseInterface;
 
     /**
-     * @return array
+     * @return Route
      */
-    public function getPath(): array;
+    public function getPath(): Route;
 
     /**
-     * @param mixed $path
-     * @param string|null $action_name
+     * @param Route $route
      * @return void
      */
-    public function setPath($module_name, string $action_name = null): void;
+    public function setPath(Route $route): void;
 
     /**
      * @param ServerRequestInterface $request
