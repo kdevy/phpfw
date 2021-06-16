@@ -8,6 +8,7 @@
 
 /**
  * print_r ラッパー関数 ブラウザ表示用
+ * TODO: いずれ削除
  *
  * @param mixed $value
  * @param mixed ...$args
@@ -28,6 +29,7 @@ function pr($value, ...$args): void
 
 /**
  * print_r ラッパー関数（エスケープ済） ブラウザ表示用
+ * TODO: いずれ削除
  *
  * @param mixed $value
  * @param mixed ...$args
@@ -44,6 +46,7 @@ function hpr($value, ...$args): void
 
 /**
  * var_dump ラッパー関数 ブラウザ表示用
+ * TODO: いずれ削除
  *
  * @param mixed $value
  * @param mixed ...$args
@@ -63,7 +66,7 @@ function vd($value, ...$args): void
 }
 
 /**
- * var_dump ラッパー関数
+ * var_dump()の実行結果を文字列として返す
  *
  * @param mixed $value
  * @return string
@@ -95,7 +98,7 @@ function logsave(string $location, $value, int $level = LINFO): void
         $location = $exp[1];
         $filename = STATUS_DIR . DS . $exp[0] . ".log";
     } else {
-        $filename = STATUS_DIR . DS . "default" . ".log";
+        $filename = STATUS_DIR . DS . "default.log";
     }
     $output = "[" . date("Y-m-d H:i:s") . "][" . str_pad($location, 8) . "][" . LOG_NAMES[$level] . "] ";
     $file = fopen($filename, "a");

@@ -11,5 +11,3 @@ vendor/
 
 .php-cs-fixer.cache
 .php-cs-fixer.php
-
-tests/

@@ -8,8 +8,6 @@
 
 namespace Framework;
 
-use InvalidArgumentException;
-
 /**
  * アプリケーションの呼び出しの起点となるルートパスを構成する
  *
@@ -171,7 +169,6 @@ class Route
                 $result = [$module_name, $action_name];
             }
         }
-
         if (!isset($result)) {
             throw new \InvalidArgumentException("Arguments that cannot be parsed.");
         }
