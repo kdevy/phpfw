@@ -62,7 +62,7 @@ $server_request = $creator->fromGlobals();
 
 $route = Route::create($server_request->getUri()->getPath());
 
-logsave("system:init", "-> Start application from " . $route->getPathName() . " .");
+logsave("system:init", "-> Start application from (" . $route->getPathName() . ").");
 
 $action_object = loadAction($route, $server_request);
 

@@ -36,8 +36,8 @@ function render(ActionInterface $action, array $contexts = [], ?ResponseInterfac
         logsave("system:render", "Failed to render, the file does not exist ("
             . $action->route->getPathName() . ").", LDEBUG);
     } else {
-        logsave("system:render", "Render from ("
-            . $action->route->getPathName() . ").", LDEBUG);
+        logsave("system:render", "Render template from ("
+            . $action->route->getModuleName() . "/" . $action->route->getTemplateName() . ".html).", LDEBUG);
     }
 
     return createContentsResponse($contents, $response);
@@ -142,7 +142,7 @@ function loadAction(Route $route, ServerRequestInterface $request): ?ActionInter
     $action_class = $route->getActionClassName();
     $action_file_path = $route->getActionAbsPath();
 
-    logsave("system:loadAction", "Load class from (" . $route->getPathName() . ").", LDEBUG);
+    logsave("system:loadAction", "Load class from (/" . $route->getModuleName() . "/" . $action_class . ").", LDEBUG);
     if (!file_exists($action_file_path)) {
         logsave("system:loadAction", "Not file exists ($action_file_path).", LDEBUG);
         return null;
