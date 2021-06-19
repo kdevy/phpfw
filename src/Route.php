@@ -16,6 +16,7 @@ namespace Framework;
 class Route
 {
     private array $path;
+    private array $args;
 
     /**
      * @param string|array $module_name
@@ -24,6 +25,7 @@ class Route
     public function __construct($module_name, $action_name = null)
     {
         $this->path = self::parse($module_name, $action_name);
+        $this->args = array_pop($this->path);
     }
 
     /**
@@ -32,6 +34,14 @@ class Route
     public function __toString()
     {
         return $this->getPathName();
+    }
+
+    /**
+     * @return array
+     */
+    public function getArgs(): array
+    {
+        return $this->args;
     }
 
     /**
@@ -47,9 +57,10 @@ class Route
      * @param string|null $action_name
      * @return self
      */
-    public function setPath($module_name, $action_name): self
+    public function setPath($module_name, $action_name = null): self
     {
         $this->path = self::parse($module_name, $action_name);
+        $this->args = array_pop($this->path);
         return $this;
     }
 
@@ -58,9 +69,10 @@ class Route
      * @param string|null $action_name
      * @return self
      */
-    public function withPath($module_name, $action_name): array
+    public function withPath($module_name, $action_name = null): array
     {
         $this->path = self::parse($module_name, $action_name);
+        $this->args = array_pop($this->path);
         return $this->path;
     }
 
@@ -152,6 +164,7 @@ class Route
     static public function parse($module_name, $action_name = null): array
     {
         $result = null;
+        $args = [];
 
         // from array
         if (is_array($module_name)) {
@@ -172,8 +185,14 @@ class Route
         if (!isset($result)) {
             throw new \InvalidArgumentException("Arguments that cannot be parsed.");
         }
+        // パスの二階層目以降はargsとする
         if (count($result) > 2) {
-            throw new \InvalidArgumentException("Root path is up to two hierarchy.");
+            $args = array_slice($result, 2);
+            array_splice($result, 2);
+            if (end($args) === "") {
+                array_pop($args);
+            }
+            reset($args);
         }
 
         if (count($result) == 1) {
@@ -183,6 +202,7 @@ class Route
             $result[0] = (isset($result[0]) && trim($result[0]) !== "" ? $result[0] : "index");
             $result[1] = (isset($result[1]) && trim($result[1]) !== "" ? $result[1] : "index");
         }
+        $result[2] = $args;
         return $result;
     }
 

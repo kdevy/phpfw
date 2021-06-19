@@ -30,7 +30,7 @@ function render(ActionInterface $action, array $contexts = [], ?ResponseInterfac
     $contexts["MODULE_NAME"] = $action->route->getModuleName();
     $contexts["ACTION_NAME"] = $action->route->getActionName();
 
-    $contents = getAssignedFileContents($action->route, $contexts);
+    $contents = getAssignedFileContents($action->route->getTemplateAbsPath(), $contexts);
     if (!isset($contents)) {
         $contents = "";
         logsave("system:render", "Failed to render, the file does not exist ("
@@ -71,23 +71,23 @@ function createContentsResponse(?string $contents, ResponseInterface $response =
  *
  * 存在しないファイル場合はnullを返す
  *
- * @param Route $route
+ * @param string $path
  * @param array $contexts
  * @return null|string
  */
-function getAssignedFileContents(Route $route, array $contexts = []): ?string
+function getAssignedFileContents(string $path, array $contexts = []): ?string
 {
-    return assignContexts(getFileContents($route), $contexts);
+    return assignContexts(getFileContents($path), $contexts);
 }
 
 /**
- * @param Route
- * @return void
+ * セーフティなfile_get_contents
+ *
+ * @var string $path
+ * @return string|null
  */
-function getFileContents(Route $route): ?string
+function getFileContents(string $path): ?string
 {
-    $path = $route->getTemplateAbsPath();
-
     if (file_exists($path)) {
         return file_get_contents($path);
     }

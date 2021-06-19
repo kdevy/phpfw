@@ -52,14 +52,14 @@ class Render
             $response = $psr17_factory->createResponse(200);
         }
         if (isset($this->template_route)) {
-            $template = getFileContents($this->template_route);
+            $template = getFileContents($this->template_route->getTemplateAbsPath());
             if (!isset($template)) {
                 throw new \RuntimeException("Template file does not exsits ({$this->template_route}).");
             }
         }
         $template = str_replace(
             CONTEXT_KEYWORD . self::TEMPLATE_CONTEXT_NAME . CONTEXT_KEYWORD,
-            getFileContents($this->route),
+            getFileContents($this->route->getTemplateAbsPath()),
             $template
         );
         $template = assignContexts($template, $contexts);
