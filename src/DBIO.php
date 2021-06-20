@@ -8,6 +8,8 @@
 
 namespace Framework;
 
+use Framework\Exception\InValidFieldName;
+
 class DBIO
 {
     /**
@@ -63,9 +65,9 @@ class DBIO
             $this->dbh->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
         } catch (\PDOException $e) {
             if (DEBUG) {
-                echo "DBIO Error: " . $e->getMessage();
+                echo "DBIO Error: " . makeErrorMessage($e);
             } else {
-                echo "Error: An error occurred while operating the database.";
+                echo "Error: An error occurred.";
             }
             logsave("system:DBIO", $e, LERROR);
             exit();
@@ -89,24 +91,20 @@ class DBIO
     public function sqlbind(string $sql, array $params = []): void
     {
         try {
-            if (!isset($this->dbh)) {
-                throw new \PDOException("The database connection has not been established.");
+            if (DEBUG) {
+                logsave("database:sqlbind", self::getSqlStatement($sql, $params), LDEBUG);
             }
-
             $this->stmt = $this->dbh->prepare($sql);
 
             foreach ($params as $key => $value) {
                 $this->stmt->bindValue($key + 1, $value);
             }
             $this->stmt->execute();
-            if (DEBUG) {
-                logsave("database:sqlbind", self::getSqlStatement($sql, $params));
-            }
         } catch (\PDOException $e) {
             if (DEBUG) {
-                echo "DBIO Error: " . $e->getMessage();
+                echo "DBIO Error: " . makeErrorMessage($e);
             } else {
-                echo "Error: An error occurred while operating the database.";
+                echo "Error: An error occurred.";
             }
 
             logsave("system:DBIO", $e, LERROR);
@@ -120,16 +118,12 @@ class DBIO
     public function fetch()
     {
         try {
-            if (!isset($this->dbh) || !isset($this->stmt)) {
-                throw new \PDOException("The database connection has not been established.");
-            }
-
             return $this->stmt->fetch();
         } catch (\PDOException $e) {
             if (DEBUG) {
-                echo "DBIO Error: " . $e->getMessage();
+                echo "DBIO Error: " . makeErrorMessage($e);
             } else {
-                echo "Error: An error occurred while operating the database.";
+                echo "Error: An error occurred.";
             }
             logsave("system:DBIO", $e, LERROR);
             exit();
@@ -142,10 +136,6 @@ class DBIO
     public function fetchAssoc(): array
     {
         try {
-            if (!isset($this->dbh) || !isset($this->stmt)) {
-                throw new \PDOException("The database connection has not been established.");
-            }
-
             $res = $this->stmt->fetch(\PDO::FETCH_ASSOC);
             if (!$res) {
                 return [];
@@ -154,9 +144,9 @@ class DBIO
             }
         } catch (\PDOException $e) {
             if (DEBUG) {
-                echo "DBIO Error: " . $e->getMessage();
+                echo "DBIO Error: " . makeErrorMessage($e);
             } else {
-                echo "Error: An error occurred while operating the database.";
+                echo "Error: An error occurred.";
             }
             logsave("system:DBIO", $e, LERROR);
             exit();
@@ -169,8 +159,204 @@ class DBIO
      */
     public function getColumns(string $tablename): array
     {
-        $sth = $this->dbh->query("SHOW COLUMNS FROM {$tablename}");
-        return $sth->fetchAll(\PDO::FETCH_COLUMN);
+        try {
+            self::validateFields($tablename);
+            $sth = $this->dbh->query("SHOW COLUMNS FROM {$tablename}");
+            return $sth->fetchAll(\PDO::FETCH_COLUMN);
+        } catch (\PDOException $e) {
+            if (DEBUG) {
+                echo "DBIO Error: " . makeErrorMessage($e);
+            } else {
+                echo "Error: An error occurred.";
+            }
+            logsave("system:DBIO", $e, LERROR);
+            exit();
+        }
+    }
+
+    /**
+     * @param string $sql
+     * @param array $params
+     * @return array
+     */
+    public function getAll(string $sql, array $params = []): array
+    {
+        try {
+            $this->sqlbind($sql, $params);
+            $result = $this->stmt->fetchAll();
+            $this->stmt->closeCursor();
+
+            return $result;
+        } catch (\PDOException $e) {
+            if (DEBUG) {
+                echo "DBIO Error: " . makeErrorMessage($e);
+            } else {
+                echo "Error: An error occurred.";
+            }
+            logsave("system:DBIO", $e, LERROR);
+            exit();
+        }
+    }
+
+    /**
+     * @param string $sql
+     * @param array $params
+     * @return array
+     */
+    public function getAllAssoc(string $sql, array $params = []): array
+    {
+        try {
+            $this->sqlbind($sql, $params);
+            $result = $this->stmt->fetchAll(\PDO::FETCH_ASSOC);
+            $this->stmt->closeCursor();
+
+            return $result;
+        } catch (\PDOException $e) {
+            if (DEBUG) {
+                echo "DBIO Error: " . makeErrorMessage($e);
+            } else {
+                echo "Error: An error occurred.";
+            }
+            logsave("system:DBIO", $e, LERROR);
+            exit();
+        }
+    }
+
+    /**
+     * @param string $sql
+     * @param array $params
+     * @return array
+     */
+    public function getRow(string $sql, array $params = []): array
+    {
+        try {
+            $this->sqlbind($sql, $params);
+            $result = $this->stmt->fetch();
+            $this->stmt->closeCursor();
+
+            return $result;
+        } catch (\PDOException $e) {
+            if (DEBUG) {
+                echo "DBIO Error: " . makeErrorMessage($e);
+            } else {
+                echo "Error: An error occurred.";
+            }
+            logsave("system:DBIO", $e, LERROR);
+            exit();
+        }
+    }
+
+    /**
+     * @param string $sql
+     * @param array $params
+     * @return array
+     */
+    public function getRowAssoc(string $sql, array $params = []): array
+    {
+        try {
+            $this->sqlbind($sql, $params);
+            $result = $this->stmt->fetch(\PDO::FETCH_ASSOC);
+            $this->stmt->closeCursor();
+
+            return $result;
+        } catch (\PDOException $e) {
+            if (DEBUG) {
+                echo "DBIO Error: " . makeErrorMessage($e);
+            } else {
+                echo "Error: An error occurred.";
+            }
+            logsave("system:DBIO", $e, LERROR);
+            exit();
+        }
+    }
+
+    /**
+     * @param string $sql
+     * @param array $params
+     * @param integer $key
+     * @return mixed
+     */
+    public function getOne($key, string $sql, array $params)
+    {
+        $result = $this->getRow($sql, $params);
+        return $result[$key] ?? null;
+    }
+
+    /**
+     * @param array $where_params
+     * @param string $tablename
+     * @param string|null $orderby
+     * @return array
+     */
+    public function getDataAll(array $where_params = [], string $tablename, ?string $orderby = null): array
+    {
+        list($where_str, $params) = self::makeWhereString($where_params);
+
+        $where_str = (!empty($where_str) ? "WHERE {$where_str}" : "");
+        $sql = "SELECT * FROM `{$tablename}` {$where_str} {$orderby};";
+
+        return $this->getAll($sql, $params);
+    }
+
+    /**
+     * @param array $where_params
+     * @param string $tablename
+     * @param string|null $orderby
+     * @return array
+     */
+    public function getDataAllAssoc(array $where_params = [], string $tablename, ?string $orderby = null): array
+    {
+        list($where_str, $params) = self::makeWhereString($where_params);
+
+        $where_str = (!empty($where_str) ? "WHERE {$where_str}" : "");
+        $sql = "SELECT * FROM `{$tablename}` {$where_str} {$orderby};";
+
+        return $this->getAllAssoc($sql, $params);
+    }
+
+    /**
+     * @param array $where_params
+     * @param string $tablename
+     * @return array
+     */
+    public function getDataRow(array $where_params = [], string $tablename): array
+    {
+        list($where_str, $params) = self::makeWhereString($where_params);
+
+        $where_str = (!empty($where_str) ? "WHERE {$where_str}" : "");
+        $sql = "SELECT * FROM `{$tablename}` {$where_str};";
+
+        return $this->getRow($sql, $params);
+    }
+
+    /**
+     * @param array $where_params
+     * @param string $tablename
+     * @return array
+     */
+    public function getDataRowAssoc(array $where_params = [], string $tablename): array
+    {
+        list($where_str, $params) = self::makeWhereString($where_params);
+
+        $where_str = (!empty($where_str) ? "WHERE {$where_str}" : "");
+        $sql = "SELECT * FROM `{$tablename}` {$where_str};";
+
+        return $this->getRowAssoc($sql, $params);
+    }
+
+    /**
+     * @param array $where_params
+     * @param string $tablename
+     * @return mixed
+     */
+    public function getDataOne($key, array $where_params = [], string $tablename)
+    {
+        list($where_str, $params) = self::makeWhereString($where_params);
+
+        $where_str = (!empty($where_str) ? "WHERE {$where_str}" : "");
+        $sql = "SELECT * FROM `{$tablename}` {$where_str};";
+
+        return $this->getOne($key, $sql, $params);
     }
 
     /**
@@ -181,14 +367,15 @@ class DBIO
      */
     public function save(array $data, string $tablename, string $pkey = "id"): int
     {
+        self::validateFields([$tablename, $pkey]);
         // プライマリキー指定の場合は既存データをチェック
-        $res = [];
+        $is_new = true;
         if (array_key_exists($pkey, $data)) {
-            $this->sqlbind("SELECT {$pkey} FROM {$tablename} WHERE {$pkey}=?;", [$data[$pkey]]);
-            $res = $this->fetchAssoc();
+            $this->sqlbind("SELECT count({$pkey}) FROM {$tablename} WHERE {$pkey}=?;", [$data[$pkey]]);
+            $is_new = (intval($this->fetchAssoc()[0]) === 0 ? true : false);
         }
         // 既存データが無い場合はインサート
-        if (count($res) == 0) {
+        if ($is_new) {
             return $this->insert($data, $tablename);
         }
         // 既存データがある場合はアップデート
@@ -206,9 +393,11 @@ class DBIO
      */
     public function insert(array $data, string $tablename): int
     {
+        self::validateFields($tablename);
         // テーブルに存在しないキー名を除外
         $columns = $this->getColumns($tablename);
         $data = array_filter($data, function ($key) use ($columns) {
+            self::validateFields($key);
             return in_array($key, $columns);
         }, ARRAY_FILTER_USE_KEY);
 
@@ -232,9 +421,11 @@ class DBIO
      */
     public function update(array $data, string $tablename, string $pkey = "id"): bool
     {
+        self::validateFields($tablename, $pkey);
         // テーブルに存在しないキー名を除外
         $columns = $this->getColumns($tablename);
         $data = array_filter($data, function ($key) use ($columns) {
+            self::validateFields($key);
             return in_array($key, $columns);
         }, ARRAY_FILTER_USE_KEY);
 
@@ -257,7 +448,7 @@ class DBIO
     /**
      * SQLとパラメータでアサイン済みのSQL文を取得する
      *
-     * 実際に実行されるSQL文との一致を保証するものではないく、あくまでもデバッグ用。
+     * 実際に実行されるSQL文との一致を保証するものではなく、あくまでもデバッグ用。
      *
      * @param string $sql
      * @param array $params
@@ -268,20 +459,20 @@ class DBIO
         $result = "";
         $exp = explode("?", $sql);
 
-        if (count($exp) - 1 !== count($params)) {
-            throw new \InvalidArgumentException("The number of parameters and placeholders do not match.");
-        }
+        // TODO: nullが値として渡された時にここでエラーになる
+        // if (count($exp) - 1 !== count($params)) {
+        //     throw new \InvalidArgumentException("The number of parameters and placeholders do not match.");
+        // }
 
         foreach ($exp as $key => $part) {
-            $value = $params[$key];
+            if (count($exp) - 1 != $key) {
+                $value = $params[$key];
 
-            if (is_string($value)) {
-                $value = "'{$value}'";
-            } elseif (is_null($value)) {
-                $value = "NULL";
-            }
-
-            if (count($exp) - 1 !== $key) {
+                if (is_string($value)) {
+                    $value = "'{$value}'";
+                } elseif (is_null($value)) {
+                    $value = "NULL";
+                }
                 $result .= $part . $value;
             } else {
                 $result .= $part;
@@ -289,5 +480,80 @@ class DBIO
         }
 
         return $result;
+    }
+
+    /**
+     * 配列を元にWhere句を生成
+     *
+     * ['field_name' => 'value'] or ['field_name' => ['value', 'condition', 'separator']]
+     *
+     * @param array $where_params
+     * @return array
+     */
+    static public function makeWhereString(array $where_params): array
+    {
+        $result = ["", []];
+
+        if (empty($where_params)) {
+            return $result;
+        }
+
+        foreach ($where_params as $key => $param) {
+            self::validateFields($key);
+            $value = $param;
+            $condition = "=";
+            $separator = "AND";
+
+            if (is_array($param)) {
+                $value = $param[0];
+                $condition = $param[1] ?? "=";
+                $separator = $param[2] ?? "AND";
+            }
+
+            if ($condition === false) {
+                $result[0] .= "{$key} {$value} {$separator} ";
+            } elseif (is_null($value)) {
+                $result[0] .= "{$key} IS NULL {$separator} ";
+            } else {
+                $result[0] .= "{$key} {$condition} ? {$separator} ";
+                $result[1][] = $value;
+            }
+        }
+        $result[0] = substr($result[0], 0, -4);
+        return $result;
+    }
+
+    /**
+     * 原則動的に渡されたフィールド名とテーブル名はこれを通す
+     *
+     * @param string|array $fieldnames
+     * @return bool
+     * @throws InValidFieldName
+     */
+    static public function validateFields($fieldnames): bool
+    {
+        try {
+            if (is_array($fieldnames)) {
+                foreach ($fieldnames as $name) {
+                    if (preg_match('/^[_a-zA-Z0-9]+$/', $name) !== 1) {
+                        throw new InValidFieldName();
+                    }
+                }
+            } else {
+                if (preg_match('/^[_a-zA-Z0-9]+$/', $fieldnames) !== 1) {
+                    throw new InValidFieldName();
+                }
+            }
+            return true;
+        } catch (\PDOException  $e) {
+            if (DEBUG) {
+                echo "DBIO Error: " . makeErrorMessage($e);
+            } else {
+                echo "Error: An error occurred.";
+            }
+
+            logsave("system:DBIO", $e, LERROR);
+            exit();
+        }
     }
 }

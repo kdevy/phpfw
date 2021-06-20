@@ -105,14 +105,7 @@ function logsave(string $location, $value, int $level = LINFO): void
 
     // exception
     if ($value instanceof Exception) {
-        $output .= str_replace(["\n", "\r", "\r\n"], " ", sprintf(
-            "%s: %s in %s(%s) Stack trace: %s",
-            $value::class,
-            $value->getMessage(),
-            $value->getFile(),
-            $value->getLine(),
-            $value->getTraceAsString()
-        ));
+        $output .= makeErrorMessage($value);
     }
     // string
     elseif (!is_array($value) && !is_object($value)) {
@@ -128,4 +121,20 @@ function logsave(string $location, $value, int $level = LINFO): void
     }
 
     fwrite($file, $output);
+}
+
+/**
+ * @param Exception $e
+ * @return string
+ */
+function makeErrorMessage(Exception $e): string
+{
+    return str_replace(["\n", "\r", "\r\n"], " ", sprintf(
+        "%s: %s in %s(%s) Stack trace: %s",
+        $e::class,
+        $e->getMessage(),
+        $e->getFile(),
+        $e->getLine(),
+        $e->getTraceAsString()
+    ));
 }
