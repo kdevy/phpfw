@@ -12,6 +12,7 @@ namespace Framework;
  * アプリケーションの呼び出しの起点となるルートパスを構成する
  *
  * ルートパスは二階層で表現されて、未指定のパスはindexとして扱われる。
+ * また、/module/action/hoge/... hoge以降のパスはargsとして渡される。
  */
 class Route
 {
@@ -143,6 +144,7 @@ class Route
      */
     public function getTemplateName(): string
     {
+        // TODO: "-"で統一するか、区切り文字は使わない方がいいか
         return strtolower(str_replace([" ", "_", "-"], "-", $this->getActionName()));
     }
 

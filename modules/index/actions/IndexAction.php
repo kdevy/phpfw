@@ -27,6 +27,7 @@ class IndexAction extends TemplateAction
      */
     public function get(ServerRequestInterface $request): ResponseInterface
     {
+        logsave("test", getallheaders());
         return $this->render->createResponse($this->getContexts($request));
     }
 

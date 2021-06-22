@@ -3,9 +3,9 @@
 use PHPUnit\Framework\TestCase;
 use Framework\Route;
 
-require_once("../config/config.php");
-require_once("../src/functions/debug.php");
-require_once("../src/functions/util.php");
+require_once(dirname(__DIR__) . DIRECTORY_SEPARATOR . "config" . DIRECTORY_SEPARATOR . "config.php");
+require_once(CODE_DIR . DS . "functions" . DS . "debug.php");
+require_once(CODE_DIR . DS . "functions" . DS . "util.php");
 
 class RouteTest extends TestCase
 {
@@ -143,18 +143,6 @@ class RouteTest extends TestCase
             DS . TEMPLATES_DIRNAME . DS . "this-is-camel-case.html", $route->getTemplateAbsPath());
         $this->assertSame(MODULE_DIR . DS . $route->getModuleName() .
             DS . ACTIONS_DIRNAME . DS . $route->getActionClassName() . ".php", $route->getActionAbsPath());
-    }
-
-    /**
-     * 不正なパス階層のテストケース
-     *
-     * @return void
-     */
-    public function testConstructTowHierarchy()
-    {
-        $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage("Root path is up to two hierarchy.");
-        $route = new Route("/hoge/fuga/piyo");
     }
 
     /**

@@ -81,16 +81,23 @@ function var_dump_string($value): string
 /**
  * status/ 配下にログ出力を行う
  *
+ * デフォルトはdefault.logに出力する。locationをhoge:fugaのようにコロンで区切れば、hoge.logとして出力される。
+ *
  * @param string $location
  * @param mixed $value
+ * @param integer $level
+ * @param boolean $is_minify
  * @return void
  */
-function logsave(string $location, $value, int $level = LINFO): void
+function logsave(string $location, $value, int $level = LINFO, bool $is_minify = true): void
 {
     $filename = null;
 
     if (LOG_LEVEL > $level) {
         return;
+    }
+    if (DEBUG) {
+        $is_minify = false;
     }
 
     if (strpos($location, ":") !== false) {
@@ -113,17 +120,23 @@ function logsave(string $location, $value, int $level = LINFO): void
     }
     // array or object
     else {
-        $output .= str_replace(
-            ["\n", "\r", "\r\n"],
-            "",
-            var_export($value, true) . PHP_EOL
-        ) . PHP_EOL;
+        if ($is_minify) {
+            $output .= str_replace(
+                ["\n", "\r", "\r\n"],
+                "",
+                var_export($value, true) . PHP_EOL
+            ) . PHP_EOL;
+        } else {
+            $output .= var_export($value, true) . PHP_EOL;
+        }
     }
 
     fwrite($file, $output);
 }
 
 /**
+ * PHP標準のエラー文みたいなのを作る
+ *
  * @param Exception $e
  * @return string
  */
