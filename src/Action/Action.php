@@ -8,14 +8,14 @@
 
 namespace Framework\Action;
 
-use Framework\Render;
+use Framework\Renderer;
 use Framework\Route;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
 abstract class Action implements ActionInterface
 {
-    protected Render $render;
+    protected Renderer $render;
 
     /**
      * @var ServerRequestInterface
@@ -30,7 +30,7 @@ abstract class Action implements ActionInterface
     public function __construct(Route $route)
     {
         $this->setPath($route);
-        $this->render = new Render();
+        $this->render = new Renderer();
         $this->render->setPath($route);
     }
 

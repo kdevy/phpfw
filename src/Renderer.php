@@ -12,7 +12,7 @@ use Nyholm\Psr7\Factory\Psr17Factory;
 use Psr\Http\Message\ResponseInterface;
 use Framework\Route;
 
-class Render
+class Renderer
 {
     private ?Route $template_route = null;
 

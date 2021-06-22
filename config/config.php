@@ -71,7 +71,7 @@ define("TEMPLATES_DIRNAME", "templates");
  * Other settings.
  */
 
-// Assign context variables in render().
+// Assign context variables in render.
 define("CONTEXT_KEYWORD", "___");
 
 // Used in APIAction. ex) ?{HTTP_ACTION}={action name}

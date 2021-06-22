@@ -7,6 +7,13 @@
  * Copyright © 2021 kdevy. All Rights Reserved.
  */
 
+/**
+ * コマンド使い方
+ *
+ * bin/manage create-module <module name>
+ * bin/manage create-action [-t type default|api|template] <module name> <action name>
+ */
+
 require_once(dirname(__DIR__) . DIRECTORY_SEPARATOR . "config" . DIRECTORY_SEPARATOR . "config.php");
 require_once(VENDOR_DIR . DS . "autoload.php");
 require_once(CODE_DIR . DS . "functions" . DS . "util.php");
