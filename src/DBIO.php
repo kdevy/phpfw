@@ -58,7 +58,7 @@ class DBIO
      */
     public function connect($target = "default"): void
     {
-        $this->destroy();
+        $this->close();
 
         try {
             $this->dbh = new \PDO($this->dsn, $this->user, $this->password);
@@ -77,7 +77,7 @@ class DBIO
     /**
      * @return void
      */
-    public function destroy(): void
+    public function close(): void
     {
         unset($this->dbh);
         unset($this->stmt);
@@ -280,169 +280,6 @@ class DBIO
     {
         $result = $this->getRow($sql, $params);
         return $result[$key] ?? null;
-    }
-
-    /**
-     * @param array $where_params
-     * @param string $tablename
-     * @param string|null $orderby
-     * @return array
-     */
-    public function getDataAll(array $where_params = [], string $tablename, ?string $orderby = null): array
-    {
-        list($where_str, $params) = self::makeWhereString($where_params);
-
-        $where_str = (!empty($where_str) ? "WHERE {$where_str}" : "");
-        $sql = "SELECT * FROM `{$tablename}` {$where_str} {$orderby};";
-
-        return $this->getAll($sql, $params);
-    }
-
-    /**
-     * @param array $where_params
-     * @param string $tablename
-     * @param string|null $orderby
-     * @return array
-     */
-    public function getDataAllAssoc(array $where_params = [], string $tablename, ?string $orderby = null): array
-    {
-        list($where_str, $params) = self::makeWhereString($where_params);
-
-        $where_str = (!empty($where_str) ? "WHERE {$where_str}" : "");
-        $sql = "SELECT * FROM `{$tablename}` {$where_str} {$orderby};";
-
-        return $this->getAllAssoc($sql, $params);
-    }
-
-    /**
-     * @param array $where_params
-     * @param string $tablename
-     * @return array
-     */
-    public function getDataRow(array $where_params = [], string $tablename): array
-    {
-        list($where_str, $params) = self::makeWhereString($where_params);
-
-        $where_str = (!empty($where_str) ? "WHERE {$where_str}" : "");
-        $sql = "SELECT * FROM `{$tablename}` {$where_str};";
-
-        return $this->getRow($sql, $params);
-    }
-
-    /**
-     * @param array $where_params
-     * @param string $tablename
-     * @return array
-     */
-    public function getDataRowAssoc(array $where_params = [], string $tablename): array
-    {
-        list($where_str, $params) = self::makeWhereString($where_params);
-
-        $where_str = (!empty($where_str) ? "WHERE {$where_str}" : "");
-        $sql = "SELECT * FROM `{$tablename}` {$where_str};";
-
-        return $this->getRowAssoc($sql, $params);
-    }
-
-    /**
-     * @param array $where_params
-     * @param string $tablename
-     * @return mixed
-     */
-    public function getDataOne($key, array $where_params = [], string $tablename)
-    {
-        list($where_str, $params) = self::makeWhereString($where_params);
-
-        $where_str = (!empty($where_str) ? "WHERE {$where_str}" : "");
-        $sql = "SELECT * FROM `{$tablename}` {$where_str};";
-
-        return $this->getOne($key, $sql, $params);
-    }
-
-    /**
-     * 単一レコードを追加または更新する
-     *
-     * @param array $data
-     * @return integer
-     */
-    public function save(array $data, string $tablename, string $pkey = "id"): int
-    {
-        self::validateFields([$tablename, $pkey]);
-        // プライマリキー指定の場合は既存データをチェック
-        $is_new = true;
-        if (array_key_exists($pkey, $data)) {
-            $this->sqlbind("SELECT count({$pkey}) FROM {$tablename} WHERE {$pkey}=?;", [$data[$pkey]]);
-            $is_new = (intval($this->fetchAssoc()[0]) === 0 ? true : false);
-        }
-        // 既存データが無い場合はインサート
-        if ($is_new) {
-            return $this->insert($data, $tablename);
-        }
-        // 既存データがある場合はアップデート
-        else {
-            return $this->update($data, $tablename, $pkey);
-        }
-    }
-
-    /**
-     * 単一レコードを追加する
-     *
-     * @param array $data
-     * @param string $tablename
-     * @return integer
-     */
-    public function insert(array $data, string $tablename): int
-    {
-        self::validateFields($tablename);
-        // テーブルに存在しないキー名を除外
-        $columns = $this->getColumns($tablename);
-        $data = array_filter($data, function ($key) use ($columns) {
-            self::validateFields($key);
-            return in_array($key, $columns);
-        }, ARRAY_FILTER_USE_KEY);
-
-        // SQL生成
-        $sql = "INSERT INTO `{$tablename}` (" . implode(", ", array_keys($data))
-            . ") VALUES (" . implode(", ", array_fill(0, count($data), "?")) . ");";
-        $params = array_values($data);
-
-        // SQL実行
-        $this->sqlbind($sql, $params);
-
-        return $this->dbh->lastInsertId();
-    }
-
-    /**
-     * 単一レコードを更新する
-     *
-     * @param array $data
-     * @param string $tablename
-     * @return bool
-     */
-    public function update(array $data, string $tablename, string $pkey = "id"): bool
-    {
-        self::validateFields($tablename, $pkey);
-        // テーブルに存在しないキー名を除外
-        $columns = $this->getColumns($tablename);
-        $data = array_filter($data, function ($key) use ($columns) {
-            self::validateFields($key);
-            return in_array($key, $columns);
-        }, ARRAY_FILTER_USE_KEY);
-
-        // SQL生成
-        $set_strs = [];
-        foreach ($data as $key => $value) {
-            $set_strs[] = "{$key}=?";
-        }
-
-        $sql = "UPDATE `{$tablename}` SET " . implode(", ", $set_strs) . " WHERE {$pkey}=?;";
-        $params = array_values($data);
-        $params[] = $data[$pkey];
-
-        // SQL実行
-        $this->sqlbind($sql, $params);
-
-        return true;
     }
 
     /**
