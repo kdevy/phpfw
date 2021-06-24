@@ -15,6 +15,8 @@ use Nyholm\Psr7Server\ServerRequestCreator;
 use Laminas\HttpHandlerRunner\Emitter\SapiEmitter;
 use Framework\Exception\HttpError;
 use Framework\Route;
+use Framework\SessionHelper;
+use Framework\User;
 
 date_default_timezone_set("Asia/Tokyo");
 
@@ -58,7 +60,11 @@ $creator = new ServerRequestCreator(
     $psr17_factory
 );
 
+$sessions = new SessionHelper();
+$sessions->set("user", new User());
+
 $server_request = $creator->fromGlobals();
+$server_request = $server_request->withAttribute(SESSION_ATTR, $sessions);
 
 $route = Route::create($server_request->getUri()->getPath());
 

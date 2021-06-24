@@ -114,3 +114,6 @@ if (DEBUG) {
 }
 
 define("SESSION_SAVE_PATH", BASE_DIR . DS . "tmp" . DS . "session");
+
+// use to server requiest attribute.
+define("SESSION_ATTR", "sessions");
