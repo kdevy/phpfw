@@ -50,7 +50,7 @@ define("DB_CONFIG", [
     "default" => [
         "HOST" => "localhost",
         "PORT" => "3306",
-        "NAME" => "world",
+        "NAME" => "bbs",
         "USER" => "root",
         "PASSWORD" => "",
         "CHARSET" => "utf8mb4",

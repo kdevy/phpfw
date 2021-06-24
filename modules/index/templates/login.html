@@ -1,0 +1,26 @@
+<main style="width:100%;max-width:430px;margin:auto;">
+    <form action="" method="post">
+        <div class="py-2 text-center">
+            <img src="/common/img/logo_transparent.png" alt="logo" width="150">
+            <h2>Login</h2>
+        </div>
+        <label for="username" class="form-label">Username</label>
+        <input type="text" name="username" id="username" class="form-control mb-2" placeholder="username" autofocus>
+        <p style="color:red;">___USERNAME_MESSAGE___</p>
+        <label for="password" class="form-label">Password</label>
+        <input type="password" name="password" id="password" class="form-control mb-2" placeholder="password">
+        <p style="color:red;">___PASSWORD_MESSAGE___</p>
+        <p style="color:red;">___MESSAGE___</p>
+        <button class="w-100 btn btn-lg btn-primary mt-4" type="submit" id="submit_btn">Login</button>
+    </form>
+</main>
+<script>
+    window.addEventListener("DOMContentLoaded", function() {
+        document.addEventListener("change", function(e) {
+            if (e.target.tagName == "INPUT") {
+                e.target.style.backgroundColor = "";
+                e.target.nextElementSibling.innerText = "";
+            }
+        });
+    });
+</script>

@@ -10,7 +10,7 @@ use Framework\Action\TemplateAction;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Message\ResponseInterface;
 
-class IndexAction extends TemplateAction
+class SignupAction extends TemplateAction
 {
     /**
      * @param ServerRequestInterface $request
@@ -46,7 +46,7 @@ class IndexAction extends TemplateAction
     public function getContexts(ServerRequestInterface $request): array
     {
         $contexts = [
-            "PAGE_TITLE" => "Top",
+            "PAGE_TITLE" => "SignUp",
         ];
         return $contexts;
     }
